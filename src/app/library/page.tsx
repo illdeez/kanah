@@ -69,8 +69,7 @@ export default function LibraryPage() {
               track.id,
               userData.completedNamesByTrack
             );
-            const isReady = hasReadyNames(track, devMode);
-            const canClick = isReady;
+            const canClick = true; // names list is always browsable
 
             const CardContent = (
               <motion.div
