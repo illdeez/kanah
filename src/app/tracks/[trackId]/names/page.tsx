@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { CheckCircle2, ChevronRight, Search } from "lucide-react";
+import { CheckCircle2, ChevronRight, Search, X } from "lucide-react";
 import { motion } from "framer-motion";
 
 import {
@@ -140,8 +140,17 @@ export default function NamesListPage() {
             onChange={(e) => setSearch(e.target.value)}
             placeholder="ابحث عن اسم…"
             dir="rtl"
-            className="w-full bg-kanah-card border border-kanah-border rounded-xl py-2.5 pr-9 pl-4 text-[14px] text-kanah-text placeholder:text-kanah-locked focus:outline-none focus:border-kanah-accent transition-colors"
+            className="w-full bg-kanah-card border border-kanah-border rounded-xl py-2.5 pr-9 pl-9 text-[14px] text-kanah-text placeholder:text-kanah-locked focus:outline-none focus:border-kanah-accent transition-colors"
           />
+          {search && (
+            <button
+              onClick={() => setSearch("")}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-kanah-locked hover:text-kanah-text transition-colors"
+              aria-label="مسح البحث"
+            >
+              <X size={15} />
+            </button>
+          )}
         </div>
       </section>
 
