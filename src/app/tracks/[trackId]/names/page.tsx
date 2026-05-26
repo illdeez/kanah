@@ -12,10 +12,8 @@ import {
   toArabicNumeral,
 } from "@/data/days";
 import {
-  getTodayTrackRead,
   getUserData,
   isDevMode,
-  isDevUnlimited,
   setActiveTrack,
   UserData,
 } from "@/lib/storage";
@@ -39,14 +37,12 @@ export default function NamesListPage() {
 
   const [userData, setUserData] = useState<UserData | null>(null);
   const [devMode, setDevMode] = useState(false);
-  const [devUnlimited, setDevUnlimited] = useState(false);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
     const data = getUserData();
     setUserData(data);
     setDevMode(isDevMode());
-    setDevUnlimited(isDevUnlimited());
     setActiveTrack(trackId);
   }, [trackId]);
 
@@ -61,8 +57,6 @@ export default function NamesListPage() {
   const progress = getNamesTrackProgress(trackId, userData.completedNamesByTrack);
   const completedNames = userData.completedNamesByTrack[trackId] ?? [];
   const completedNameStoriesByTrack = userData.completedNameStoriesByTrack ?? {};
-  const todayRead = getTodayTrackRead(userData, trackId);
-  const hasDoneToday = !!todayRead && !devUnlimited;
 
   return (
     <main className="flex flex-col min-h-screen pb-24">
@@ -122,15 +116,6 @@ export default function NamesListPage() {
         </div>
       </section>
 
-      {/* Daily limit banner */}
-      {hasDoneToday && (
-        <section className="px-6 pb-6">
-          <div className="w-full text-center py-4 rounded-2xl text-[15px] font-semibold bg-kanah-surface border border-kanah-border text-kanah-muted">
-            يكفيك اسم واحد اليوم · عُد غداً لتعيش اسماً جديداً
-          </div>
-        </section>
-      )}
-
       {/* Search */}
       <section className="px-4 pb-4">
         <div className="relative">
@@ -180,15 +165,7 @@ export default function NamesListPage() {
               ? completedSubStories >= totalSubStories
               : completedNames.includes(name.id);
             const isComingSoon = !name.contentReady && !devMode;
-            const blockedByDaily =
-              hasDoneToday &&
-              !isCompleted &&
-              !(
-                (todayRead?.itemType === "name" || todayRead?.itemType === "nameStory") &&
-                todayRead.trackId === trackId &&
-                todayRead.nameId === name.id
-              );
-            const canOpen = !isComingSoon && !blockedByDaily;
+            const canOpen = !isComingSoon;
 
             const badge = isCompleted ? (
               <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-kanah-completed bg-emerald-50 px-2 py-0.5 rounded-full">
@@ -198,10 +175,6 @@ export default function NamesListPage() {
             ) : isComingSoon ? (
               <span className="text-[10px] font-semibold text-kanah-locked bg-kanah-border px-2 py-0.5 rounded-full">
                 قريباً
-              </span>
-            ) : blockedByDaily ? (
-              <span className="text-[10px] font-semibold text-kanah-locked bg-kanah-border px-2 py-0.5 rounded-full">
-                غداً
               </span>
             ) : hasSubStories ? (
               <span className="text-[10px] font-semibold text-kanah-accent bg-kanah-accent-subtle px-2 py-0.5 rounded-full">
