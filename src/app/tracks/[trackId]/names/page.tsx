@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { CheckCircle2, ChevronRight } from "lucide-react";
+import { CheckCircle2, ChevronRight, Search } from "lucide-react";
 import { motion } from "framer-motion";
 
 import {
@@ -41,6 +41,7 @@ export default function NamesListPage() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [devMode, setDevMode] = useState(false);
   const [devUnlimited, setDevUnlimited] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const data = getUserData();
@@ -131,6 +132,21 @@ export default function NamesListPage() {
         </section>
       )}
 
+      {/* Search */}
+      <section className="px-4 pb-4">
+        <div className="relative">
+          <Search size={15} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-kanah-locked pointer-events-none" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="ابحث عن اسم…"
+            dir="rtl"
+            className="w-full bg-kanah-card border border-kanah-border rounded-xl py-2.5 pr-9 pl-4 text-[14px] text-kanah-text placeholder:text-kanah-locked focus:outline-none focus:border-kanah-accent transition-colors"
+          />
+        </div>
+      </section>
+
       {/* Names grid */}
       <section className="px-4 pb-12">
         <h2 className="text-[10px] font-semibold text-kanah-locked tracking-widest uppercase mb-4 px-2">
@@ -142,7 +158,11 @@ export default function NamesListPage() {
           animate="show"
           className="grid grid-cols-2 gap-3"
         >
-          {track.names.map((name) => {
+          {track.names.filter((name) =>
+            search.trim() === "" ||
+            name.name.includes(search.trim()) ||
+            name.title.includes(search.trim())
+          ).map((name) => {
             const isCompleted = completedNames.includes(name.id);
             const isComingSoon = !name.contentReady && !devMode;
             const blockedByDaily =
