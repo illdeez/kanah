@@ -37,7 +37,7 @@ export interface UserData {
   pledges: Pledge[];
   activeTrackId: string | null;
   firstOpenedAt: string | null;
-  dailyReads: Record<string, DailyRead>;
+  dailyReads: Record<string, Record<string, DailyRead>>;
 }
 
 const KEY = "kanah_data";
@@ -172,34 +172,38 @@ function migrateLegacyData(raw: unknown): UserData {
       ? LEGACY_PRIMARY_TRACK
       : getDefaultActiveTrackId();
 
-  const dailyReads: Record<string, DailyRead> = {};
+  const dailyReads: Record<string, Record<string, DailyRead>> = {};
   if (source.dailyReads && typeof source.dailyReads === "object") {
-    for (const [date, entry] of Object.entries(
+    for (const [date, dateEntry] of Object.entries(
       source.dailyReads as Record<string, unknown>
     )) {
-      if (!entry || typeof entry !== "object") continue;
-      const e = entry as Record<string, unknown>;
-      if (typeof e.trackId !== "string" || typeof e.completedAt !== "string") continue;
+      if (!dateEntry || typeof dateEntry !== "object") continue;
 
-      // Handle old entries that might not have itemType — default to "story"
-      const itemType: "story" | "name" = e.itemType === "name" ? "name" : "story";
-
-      if (itemType === "name") {
-        const nameId = typeof e.nameId === "string" ? e.nameId : undefined;
-        dailyReads[date] = {
-          trackId: e.trackId,
-          itemType: "name",
-          nameId,
-          completedAt: e.completedAt,
-        };
+      // Detect old format: value has trackId/completedAt directly (single read per day)
+      // New format: value is an object keyed by trackId
+      const e = dateEntry as Record<string, unknown>;
+      if (typeof e.trackId === "string" && typeof e.completedAt === "string") {
+        // Old format — migrate to new
+        const itemType: "story" | "name" = e.itemType === "name" ? "name" : "story";
+        const read: DailyRead =
+          itemType === "name"
+            ? { trackId: e.trackId, itemType: "name", nameId: typeof e.nameId === "string" ? e.nameId : undefined, completedAt: e.completedAt }
+            : { trackId: e.trackId, itemType: "story", storyId: typeof e.storyId === "number" ? e.storyId : undefined, completedAt: e.completedAt };
+        dailyReads[date] = { [e.trackId]: read };
       } else {
-        const storyId = typeof e.storyId === "number" ? e.storyId : undefined;
-        dailyReads[date] = {
-          trackId: e.trackId,
-          itemType: "story",
-          storyId,
-          completedAt: e.completedAt,
-        };
+        // New format — parse per-track entries
+        const trackMap: Record<string, DailyRead> = {};
+        for (const [trackId, trackEntry] of Object.entries(e)) {
+          if (!trackEntry || typeof trackEntry !== "object") continue;
+          const te = trackEntry as Record<string, unknown>;
+          if (typeof te.completedAt !== "string") continue;
+          const itemType: "story" | "name" = te.itemType === "name" ? "name" : "story";
+          trackMap[trackId] =
+            itemType === "name"
+              ? { trackId, itemType: "name", nameId: typeof te.nameId === "string" ? te.nameId : undefined, completedAt: te.completedAt }
+              : { trackId, itemType: "story", storyId: typeof te.storyId === "number" ? te.storyId : undefined, completedAt: te.completedAt };
+        }
+        if (Object.keys(trackMap).length > 0) dailyReads[date] = trackMap;
       }
     }
   }
@@ -254,8 +258,17 @@ export function getTodayString(): string {
   return new Date().toISOString().split("T")[0];
 }
 
+/** Returns the read for a specific track today, or null. */
+export function getTodayTrackRead(data: UserData, trackId: string): DailyRead | null {
+  return data.dailyReads?.[getTodayString()]?.[trackId] ?? null;
+}
+
+/** Returns any read from today (for display purposes on home/trace pages). */
 export function getTodayRead(data: UserData): DailyRead | null {
-  return data.dailyReads?.[getTodayString()] ?? null;
+  const todayMap = data.dailyReads?.[getTodayString()];
+  if (!todayMap) return null;
+  const values = Object.values(todayMap);
+  return values.length > 0 ? values[values.length - 1] : null;
 }
 
 export function isDevUnlimited(): boolean {
@@ -271,8 +284,9 @@ export function completeStory(trackId: string, storyId: number): void {
   }
   data.activeTrackId = trackId;
   const today = getTodayString();
-  if (!data.dailyReads[today]) {
-    data.dailyReads[today] = {
+  if (!data.dailyReads[today]) data.dailyReads[today] = {};
+  if (!data.dailyReads[today][trackId]) {
+    data.dailyReads[today][trackId] = {
       trackId,
       itemType: "story",
       storyId,
@@ -290,8 +304,9 @@ export function completeName(trackId: string, nameId: string): void {
   }
   data.activeTrackId = trackId;
   const today = getTodayString();
-  if (!data.dailyReads[today]) {
-    data.dailyReads[today] = {
+  if (!data.dailyReads[today]) data.dailyReads[today] = {};
+  if (!data.dailyReads[today][trackId]) {
+    data.dailyReads[today][trackId] = {
       trackId,
       itemType: "name",
       nameId,

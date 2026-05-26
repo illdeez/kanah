@@ -16,7 +16,7 @@ import {
   isWordTrack,
   toArabicNumeral,
 } from "@/data/days";
-import { getTodayRead, getUserData, isDevMode, isDevUnlimited, setActiveTrack, UserData } from "@/lib/storage";
+import { getTodayTrackRead, getUserData, isDevMode, isDevUnlimited, setActiveTrack, UserData } from "@/lib/storage";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 const listContainer = {
@@ -63,7 +63,7 @@ export default function TrackPage() {
 
   const isReady = hasReadyStories(wordTrack, devMode);
   const progress = getTrackProgress(wordTrack.id, userData.completedStoriesByTrack);
-  const todayRead = getTodayRead(userData);
+  const todayRead = getTodayTrackRead(userData, trackId);
   const hasDoneToday = !!todayRead && !devUnlimited;
   const nextStory = hasDoneToday
     ? null

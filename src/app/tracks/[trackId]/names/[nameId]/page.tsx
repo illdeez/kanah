@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getName, getNamesTrack, toArabicNumeral } from "@/data/days";
 import {
   completeName,
-  getTodayRead,
+  getTodayTrackRead,
   getUserData,
   isDevMode,
   isDevUnlimited,
@@ -75,16 +75,12 @@ export default function NamePage() {
     ? (userData.completedNamesByTrack[trackId] ?? []).includes(nameId)
     : false;
 
-  const todayRead = userData ? getTodayRead(userData) : null;
+  const todayRead = userData ? getTodayTrackRead(userData, trackId) : null;
   const blockedByDaily =
     !devUnlimited &&
     !isCompleted &&
     !!todayRead &&
-    !(
-      todayRead.trackId === trackId &&
-      todayRead.itemType === "name" &&
-      todayRead.nameId === nameId
-    );
+    !(todayRead.itemType === "name" && todayRead.nameId === nameId);
 
   useEffect(() => {
     if (!userData) return;

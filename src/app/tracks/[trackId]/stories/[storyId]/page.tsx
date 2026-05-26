@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getStory, getStoryStatus, getTrack, isWordTrack, toArabicNumeral } from "@/data/days";
 import {
   completeStory,
-  getTodayRead,
+  getTodayTrackRead,
   getUserData,
   isDevMode,
   isDevUnlimited,
@@ -73,16 +73,12 @@ export default function StoryPage() {
   const isCompleted = userData
     ? (userData.completedStoriesByTrack[trackId] ?? []).includes(storyId)
     : false;
-  const todayRead = userData ? getTodayRead(userData) : null;
+  const todayRead = userData ? getTodayTrackRead(userData, trackId) : null;
   const blockedByDaily =
     !devUnlimited &&
     !isCompleted &&
     !!todayRead &&
-    !(
-      todayRead.trackId === trackId &&
-      todayRead.itemType !== "name" &&
-      todayRead.storyId === storyId
-    );
+    !(todayRead.itemType !== "name" && todayRead.storyId === storyId);
 
   useEffect(() => {
     if (!userData) return;
