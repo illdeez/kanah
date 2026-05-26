@@ -1397,7 +1397,28 @@ const asmaNames: NameItem[] = [
   { id: "al-basir", number: 27, name: "البصير", title: "المُبصِر لكل شيء ظاهر وخفي", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
   { id: "al-hakam", number: 28, name: "الحكم", title: "الحاكم العدل بين عباده", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
   { id: "al-adl", number: 29, name: "العدل", title: "العادل في كل حكم وقضاء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
-  { id: "al-latif", number: 30, name: "اللطيف", title: "اللطيف بعباده الخبير بهم", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-latif", number: 30, name: "اللطيف", title: "حين يدبّر الله لك من حيث لا تشعر", readingTime: "٤ دقائق", story: `كان يفتح بريده كل صباح كما يفتح الإنسان باباً ضيقاً على مصير واسع.
+
+رسالة واحدة كان ينتظرها منذ أسابيع. وظيفة ظنّ أنها ستكون بداية الطريق الذي تأخر كثيراً. كان قد رتّب حياته عليها قبل أن تأتي: تخيّل المكتب، الطريق إليه، أول راتب، نظرة أمه حين يخبرها أن التعب لم يذهب هدراً.
+
+وفي صباح رمادي، جاءت الرسالة.
+
+قرأ أول سطر، ثم توقف.
+لم يكن فيها قسوة، لكنها كانت كافية لتُسكت شيئاً في صدره.
+
+"نعتذر…"
+
+أغلق الحاسوب، وبقي ينظر إلى الطاولة. لم يبكِ. بعض الخيبات لا تأتي على هيئة دموع، تأتي على هيئة صمت طويل. شعر أن الباب الذي انتظره انغلق في وجهه بهدوء، كأن الحياة لا تريد حتى أن تعتذر له بصوت مسموع.
+
+مرّت أيام، ثم أسابيع. وفي وقت لم يكن ينتظر فيه شيئاً، اتصل به صديق قديم. عرض عليه عملاً صغيراً، مؤقتاً، غير لامع، لا يشبه ما كان يحلم به. قبله بلا حماس، كمن يمشي في طريق جانبي فقط لأنه لم يجد الطريق الكبير.
+
+لكن ذلك الطريق الجانبي فتح له وجوهاً لم يكن يعرفها من نفسه. تعلّم، اقترب من أناس طيبين، استعاد ثقته شيئاً فشيئاً. وبعد أشهر، حين تذكر تلك الرسالة الأولى، لم يقل إن قلبه لم يتألم. بل قال شيئاً آخر:
+ربما كان الباب الذي أُغلق لا يطردني، بل يحميني من طريق لم يكن لي.
+
+لم يعرف كل الحكمة. لا أحد يعرف كل الخيوط. لكنه شعر أن في الحياة يداً خفية لا تصرخ، لا تشرح كل شيء، لكنها ترتب برفق ما كان سيتكسر لو جاء على عجل.
+
+هناك لطف لا نراه وهو يحدث.
+نراه فقط حين نلتفت بعد زمن، فنجد أن الخيبة لم تكن نهاية الطريق، بل انحناءة صغيرة نحو باب أهدأ.`, hiddenMeaning: "اللّطيف هو الذي يبلغ عبده الخير بطرق خفية رفيقة، ويعلم تفاصيل الطريق التي لا يراها العبد. ليس لطفه دائماً في أن يعطيك ما طلبت، بل قد يكون في أن يصرف عنك ما كنت تظنه نجاة.", lifeImpact: "حين تؤمن باللّطيف، لا يعود التأخير دليلاً قاطعاً على الحرمان. ولا يصبح الباب المغلق حكماً نهائياً على مستقبلك. تتعلم أن بعض الطرق تحتاج أن تُقاد إليها بهدوء، لا أن تُفتح لك دفعة واحدة.", reflectionQuestion: "ما الباب الذي ما زلت تنظر إليه كحرمان، مع أنك لا تعرف بعد ما الذي صرفه الله عنك خلفه؟", dailyAction: "اكتب خيبة قديمة، ثم اكتب بجانبها: \"ما الذي تعلّمته أو نجا فيّ بسببها؟\"", selectedLines: ["بعض الأبواب لا تُغلق لتطردك، بل لتحميك من طريق لم يكن لك.", "هناك لطف لا نراه وهو يحدث، نراه فقط حين نلتفت بعد زمن.", "ليس كل تأخير قسوة؛ أحياناً يكون التأخير يداً رحيمة تمسكك من السقوط."], pledgeText: "سأترك مساحة هادئة لاحتمال أن الله يدبّر لي ما لا أراه.", contentReady: true },
   { id: "al-khabir", number: 31, name: "الخبير", title: "العليم بخفايا الأمور", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
   { id: "al-halim", number: 32, name: "الحليم", title: "الصبور الذي لا يعجّل بالعقوبة", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
   { id: "al-azim", number: 33, name: "العظيم", title: "المتصف بكل صفات الكمال", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
@@ -1919,15 +1940,6 @@ export const wordTracks: Track[] = [
     description: "رحلة من ١٠ قصص ترى فيها الصدقة من زوايا مختلفة: المال، الوقت، الكلمة، الستر، الخفاء، والخوف من النقص.",
     totalStories: 10,
     stories: sadaqahStories,
-  },
-  {
-    id: "al-latif",
-    type: "wordTrack",
-    word: "اللطيف",
-    subtitle: "أن ترى يد الله في ما لم تفهمه بعد",
-    description: "رحلة من ١٠ قصص تكشف لطف الله في التأخير، والمنع، والفرج الهادئ، وكل ما لم يأتِ كما تخيّلته.",
-    totalStories: 10,
-    stories: latifStories,
   },
   {
     id: "asma-allah-al-husna",
