@@ -10,6 +10,7 @@ import {
   getNamesTrack,
   getNamesTrackProgress,
   toArabicNumeral,
+  getTrack,
 } from "@/data/days";
 import {
   getTodayRead,
@@ -60,7 +61,8 @@ export default function NamesListPage() {
   const progress = getNamesTrackProgress(trackId, userData.completedNamesByTrack);
   const completedNames = userData.completedNamesByTrack[trackId] ?? [];
   const todayRead = getTodayRead(userData);
-  const hasDoneToday = !!todayRead && !devUnlimited;
+  const todayTrackStillExists = todayRead ? !!getTrack(todayRead.trackId) : true;
+  const hasDoneToday = !!todayRead && !devUnlimited && todayTrackStillExists;
 
   return (
     <main className="flex flex-col min-h-screen pb-24">
