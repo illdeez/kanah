@@ -7,8 +7,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getName, getNamesTrack, toArabicNumeral } from "@/data/days";
 import {
   completeNameStory,
+  getTodayTrackRead,
   getUserData,
   isDevMode,
+  isDevUnlimited,
   setActiveTrack,
   UserData,
 } from "@/lib/storage";
@@ -55,6 +57,7 @@ export default function NameStoryPage() {
 
   const [userData, setUserData] = useState<UserData | null>(null);
   const [devMode, setDevMode] = useState(false);
+  const [devUnlimited, setDevUnlimited] = useState(false);
   const [completing, setCompleting] = useState(false);
   const [actionSeen, setActionSeen] = useState(false);
   const actionRef = useRef<HTMLElement>(null);
@@ -62,6 +65,7 @@ export default function NameStoryPage() {
   useEffect(() => {
     setUserData(getUserData());
     setDevMode(isDevMode());
+    setDevUnlimited(isDevUnlimited());
     setActiveTrack(trackId);
   }, [trackId]);
 
@@ -91,6 +95,17 @@ export default function NameStoryPage() {
     return () => obs.disconnect();
   }, [userData, isCompleted]);
 
+  const todayRead = userData ? getTodayTrackRead(userData, trackId) : null;
+  const blockedByDaily =
+    !devUnlimited &&
+    !isCompleted &&
+    !!todayRead &&
+    !(
+      todayRead.itemType === "nameStory" &&
+      todayRead.nameId === nameId &&
+      todayRead.storyId === storyId
+    );
+
   useEffect(() => {
     if (!track || !name || !story) {
       router.replace(`/tracks/${trackId}/names/${nameId}/stories`);
@@ -105,10 +120,50 @@ export default function NameStoryPage() {
     return null;
   }
 
+  if (blockedByDaily) {
+    return (
+      <main className="flex flex-col min-h-screen" dir="rtl">
+        <header className="sticky top-0 z-40 bg-kanah-bg/95 backdrop-blur-sm border-b border-kanah-border">
+          <div className="flex items-center gap-3 px-4 h-14">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-kanah-border transition-colors"
+              aria-label="رجوع"
+            >
+              <ChevronRight size={20} className="text-kanah-muted" />
+            </button>
+          </div>
+        </header>
+        <div className="flex-1 flex flex-col items-center justify-center px-8 text-center gap-6">
+          <motion.span
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", damping: 18, stiffness: 280 }}
+            className="text-[48px] text-kanah-accent-muted block"
+          >
+            ✦
+          </motion.span>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ease, duration: 0.45, delay: 0.2 }}
+          >
+            <p className="text-[22px] font-bold text-kanah-text mb-3">
+              يكفيك قصة واحدة اليوم
+            </p>
+            <p className="text-[16px] text-kanah-muted leading-[2]">
+              عُد غداً للقصة التالية.
+            </p>
+          </motion.div>
+        </div>
+      </main>
+    );
+  }
+
   function handleComplete() {
     setCompleting(true);
     completeNameStory(trackId, nameId, storyId);
-    router.push(`/tracks/${trackId}/names/${nameId}/stories`);
+    router.push(`/tracks/${trackId}/names/${nameId}/stories/${storyId}/complete`);
   }
 
   return (
