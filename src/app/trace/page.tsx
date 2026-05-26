@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import {
   getTrack,
   getTrackProgress,
+  getNamesTrackProgress,
   getStory,
+  isNamesTrack,
+  isWordTrack,
   toArabicNumeral,
   wordTracks,
 } from "@/data/days";
@@ -56,7 +59,10 @@ export default function TracePage() {
   const totalDays = Object.keys(userData.dailyReads ?? {}).length;
   const todayRead = getTodayRead(userData);
   const todayTrack = todayRead ? getTrack(todayRead.trackId) : null;
-  const todayStory = todayRead ? getStory(todayRead.trackId, todayRead.storyId) : null;
+  const todayStory =
+    todayRead && todayRead.itemType !== "name" && todayRead.storyId != null
+      ? getStory(todayRead.trackId, todayRead.storyId)
+      : null;
   const totalCommitments = userData.pledges.length;
   const doneCount = userData.pledges.filter((pledge) => pledge.status === "done").length;
   const triedCount = userData.pledges.filter((pledge) => pledge.status === "tried").length;
@@ -198,10 +204,15 @@ export default function TracePage() {
           className="flex flex-col gap-3"
         >
           {wordTracks.map((track) => {
-            const progress = getTrackProgress(
-              track.id,
-              userData.completedStoriesByTrack
-            );
+            const progress = isNamesTrack(track)
+              ? getNamesTrackProgress(track.id, userData.completedNamesByTrack)
+              : getTrackProgress(track.id, userData.completedStoriesByTrack);
+
+            const total = isNamesTrack(track)
+              ? track.totalNames
+              : isWordTrack(track)
+              ? track.totalStories
+              : 0;
 
             return (
               <motion.div
@@ -220,7 +231,7 @@ export default function TracePage() {
                   </div>
                   <span className="text-[13px] font-semibold text-kanah-accent">
                     {toArabicNumeral(progress)} من{" "}
-                    {toArabicNumeral(track.totalStories)}
+                    {toArabicNumeral(total)}
                   </span>
                 </div>
               </motion.div>

@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { CheckCircle2, ChevronRight, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { getStory, getStoryStatus, getTrack, isWordTrack, toArabicNumeral } from "@/data/days";
+import { getName, getNamesTrack, toArabicNumeral } from "@/data/days";
 import {
-  completeStory,
+  completeName,
   getTodayRead,
   getUserData,
   isDevMode,
@@ -48,11 +48,11 @@ function Section({ children, delay = 0 }: { children: React.ReactNode; delay?: n
   );
 }
 
-export default function StoryPage() {
+export default function NamePage() {
   const params = useParams();
   const router = useRouter();
   const trackId = String(params.trackId);
-  const storyId = Number(params.storyId);
+  const nameId = String(params.nameId);
 
   const [userData, setUserData] = useState<UserData | null>(null);
   const [devMode, setDevMode] = useState(false);
@@ -65,14 +65,16 @@ export default function StoryPage() {
     setUserData(getUserData());
     setDevMode(isDevMode());
     setDevUnlimited(isDevUnlimited());
-    if (getTrack(trackId)) setActiveTrack(trackId);
+    setActiveTrack(trackId);
   }, [trackId]);
 
-  const track = getTrack(trackId);
-  const story = getStory(trackId, storyId);
+  const track = getNamesTrack(trackId);
+  const name = getName(trackId, nameId);
+
   const isCompleted = userData
-    ? (userData.completedStoriesByTrack[trackId] ?? []).includes(storyId)
+    ? (userData.completedNamesByTrack[trackId] ?? []).includes(nameId)
     : false;
+
   const todayRead = userData ? getTodayRead(userData) : null;
   const blockedByDaily =
     !devUnlimited &&
@@ -80,8 +82,8 @@ export default function StoryPage() {
     !!todayRead &&
     !(
       todayRead.trackId === trackId &&
-      todayRead.itemType !== "name" &&
-      todayRead.storyId === storyId
+      todayRead.itemType === "name" &&
+      todayRead.nameId === nameId
     );
 
   useEffect(() => {
@@ -90,7 +92,6 @@ export default function StoryPage() {
       setActionSeen(true);
       return;
     }
-
     const el = actionRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(
@@ -104,20 +105,14 @@ export default function StoryPage() {
   }, [userData, isCompleted]);
 
   useEffect(() => {
-    if (!track || !story) router.replace("/library");
-  }, [track, story, router]);
+    if (!track || !name) router.replace(`/tracks/${trackId}/names`);
+  }, [track, name, trackId, router]);
 
-  if (!userData || !track || !story) return null;
+  if (!userData || !track || !name) return null;
 
-  const status = getStoryStatus(
-    trackId,
-    storyId,
-    userData.completedStoriesByTrack,
-    devMode
-  );
-
-  if (status === "locked") {
-    router.replace(`/tracks/${trackId}`);
+  // Block if no content
+  if (!name.contentReady && !devMode) {
+    router.replace(`/tracks/${trackId}/names`);
     return null;
   }
 
@@ -153,7 +148,7 @@ export default function StoryPage() {
               يكفيك معنى واحد اليوم
             </p>
             <p className="text-[16px] text-kanah-muted leading-[2]">
-              عُد غداً لتعيش معنى جديداً.
+              عُد غداً لتعيش اسماً جديداً.
             </p>
           </motion.div>
         </div>
@@ -163,8 +158,8 @@ export default function StoryPage() {
 
   function handleComplete() {
     setCompleting(true);
-    completeStory(trackId, storyId);
-    router.push(`/tracks/${trackId}/stories/${storyId}/complete`);
+    completeName(trackId, nameId);
+    router.push(`/tracks/${trackId}/names/${nameId}/complete`);
   }
 
   return (
@@ -180,15 +175,15 @@ export default function StoryPage() {
           </button>
           <div className="flex-1 min-w-0">
             <p className="text-[10px] text-kanah-locked tracking-widest uppercase">
-              {track.word} · القصة {toArabicNumeral(story.storyNumber)}
+              اسم من أسماء الله · {name.name}
             </p>
             <p className="text-[13px] font-semibold text-kanah-text truncate leading-tight">
-              {story.title}
+              {name.title}
             </p>
           </div>
           <div className="flex items-center gap-1 text-kanah-locked text-[11px] flex-shrink-0">
             <Clock size={11} />
-            <span>{story.readingTime}</span>
+            <span>{name.readingTime}</span>
           </div>
         </div>
       </header>
@@ -201,14 +196,13 @@ export default function StoryPage() {
           className="pt-12 pb-10"
         >
           <p className="text-[10px] text-kanah-locked tracking-widest uppercase mb-5">
-            {track.word} · القصة {toArabicNumeral(story.storyNumber)} من{" "}
-            {toArabicNumeral(isWordTrack(track) ? track.totalStories : 0)}
+            الاسم {toArabicNumeral(name.number)} من {toArabicNumeral(track.totalNames)}
           </p>
-          <h1 className="text-[42px] font-extrabold text-kanah-accent leading-tight mb-4 tracking-tight">
-            {story.title}
+          <h1 className="text-[52px] font-extrabold text-kanah-accent leading-tight mb-4 tracking-tight">
+            {name.name}
           </h1>
           <p className="text-[19px] text-kanah-muted font-light leading-relaxed">
-            {track.subtitle}
+            {name.title}
           </p>
         </motion.div>
 
@@ -216,8 +210,8 @@ export default function StoryPage() {
 
         <Section>
           <section className="mb-12">
-            <SectionLabel>الكلمة</SectionLabel>
-            <p className="text-[24px] font-bold text-kanah-text">{track.word}</p>
+            <SectionLabel>الاسم</SectionLabel>
+            <p className="text-[28px] font-bold text-kanah-text">{name.name}</p>
           </section>
         </Section>
 
@@ -227,7 +221,7 @@ export default function StoryPage() {
           <section className="mb-12">
             <SectionLabel>القصة</SectionLabel>
             <p className="text-[17px] leading-[2.1] text-kanah-text whitespace-pre-line">
-              {story.story}
+              {name.story}
             </p>
           </section>
         </Section>
@@ -238,7 +232,7 @@ export default function StoryPage() {
           <section className="mb-12">
             <SectionLabel>المعنى الخفي</SectionLabel>
             <p className="text-[17px] leading-[2.1] text-kanah-text whitespace-pre-line">
-              {story.hiddenMeaning}
+              {name.hiddenMeaning}
             </p>
           </section>
         </Section>
@@ -247,9 +241,9 @@ export default function StoryPage() {
 
         <Section>
           <section className="mb-12">
-            <SectionLabel>أثرها في حياتك</SectionLabel>
+            <SectionLabel>أثره في حياتك</SectionLabel>
             <p className="text-[17px] leading-[2.1] text-kanah-text whitespace-pre-line">
-              {story.lifeImpact}
+              {name.lifeImpact}
             </p>
           </section>
         </Section>
@@ -261,7 +255,7 @@ export default function StoryPage() {
             <div className="bg-kanah-surface rounded-2xl p-6 border border-kanah-border">
               <SectionLabel>سؤال محاسبة</SectionLabel>
               <p className="text-[18px] leading-[2] text-kanah-text font-medium">
-                {story.reflectionQuestion}
+                {name.reflectionQuestion}
               </p>
             </div>
           </section>
@@ -272,7 +266,7 @@ export default function StoryPage() {
             <div className="bg-kanah-accent-subtle rounded-2xl p-6">
               <SectionLabel>عمل اليوم</SectionLabel>
               <p className="text-[17px] leading-[2.1] text-kanah-text whitespace-pre-line">
-                {story.dailyAction}
+                {name.dailyAction}
               </p>
             </div>
           </section>
@@ -287,7 +281,7 @@ export default function StoryPage() {
             className="flex items-center justify-center gap-2 py-3 text-kanah-completed font-medium text-[15px]"
           >
             <CheckCircle2 size={18} />
-            <span>أتممت هذه القصة بالفعل</span>
+            <span>أتممت هذا الاسم بالفعل</span>
           </motion.div>
         ) : (
           <AnimatePresence mode="wait">

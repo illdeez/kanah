@@ -24,12 +24,15 @@ export interface Pledge {
 
 export interface DailyRead {
   trackId: string;
-  storyId: number;
+  itemType: "story" | "name";
+  storyId?: number;
+  nameId?: string;
   completedAt: string;
 }
 
 export interface UserData {
   completedStoriesByTrack: Record<string, number[]>;
+  completedNamesByTrack: Record<string, string[]>;
   reflections: Reflection[];
   pledges: Pledge[];
   activeTrackId: string | null;
@@ -42,6 +45,7 @@ const LEGACY_PRIMARY_TRACK = "kazm-al-ghayz";
 
 const defaults: UserData = {
   completedStoriesByTrack: {},
+  completedNamesByTrack: {},
   reflections: [],
   pledges: [],
   activeTrackId: LEGACY_PRIMARY_TRACK,
@@ -77,6 +81,12 @@ function migrateLegacyData(raw: unknown): UserData {
       ...legacyValues,
     ]);
   }
+
+  const completedNamesByTrack: Record<string, string[]> =
+    source.completedNamesByTrack &&
+    typeof source.completedNamesByTrack === "object"
+      ? (source.completedNamesByTrack as Record<string, string[]>)
+      : {};
 
   const reflections: Reflection[] = Array.isArray(source.reflections)
     ? source.reflections
@@ -162,24 +172,37 @@ function migrateLegacyData(raw: unknown): UserData {
       ? LEGACY_PRIMARY_TRACK
       : getDefaultActiveTrackId();
 
-  const dailyReads: Record<string, DailyRead> =
-    source.dailyReads && typeof source.dailyReads === "object"
-      ? Object.fromEntries(
-          Object.entries(source.dailyReads as Record<string, unknown>)
-            .map(([date, entry]) => {
-              if (!entry || typeof entry !== "object") return null;
-              const e = entry as Record<string, unknown>;
-              if (
-                typeof e.trackId !== "string" ||
-                typeof e.storyId !== "number" ||
-                typeof e.completedAt !== "string"
-              )
-                return null;
-              return [date, { trackId: e.trackId, storyId: e.storyId, completedAt: e.completedAt }];
-            })
-            .filter((x): x is [string, DailyRead] => x !== null)
-        )
-      : {};
+  const dailyReads: Record<string, DailyRead> = {};
+  if (source.dailyReads && typeof source.dailyReads === "object") {
+    for (const [date, entry] of Object.entries(
+      source.dailyReads as Record<string, unknown>
+    )) {
+      if (!entry || typeof entry !== "object") continue;
+      const e = entry as Record<string, unknown>;
+      if (typeof e.trackId !== "string" || typeof e.completedAt !== "string") continue;
+
+      // Handle old entries that might not have itemType — default to "story"
+      const itemType: "story" | "name" = e.itemType === "name" ? "name" : "story";
+
+      if (itemType === "name") {
+        const nameId = typeof e.nameId === "string" ? e.nameId : undefined;
+        dailyReads[date] = {
+          trackId: e.trackId,
+          itemType: "name",
+          nameId,
+          completedAt: e.completedAt,
+        };
+      } else {
+        const storyId = typeof e.storyId === "number" ? e.storyId : undefined;
+        dailyReads[date] = {
+          trackId: e.trackId,
+          itemType: "story",
+          storyId,
+          completedAt: e.completedAt,
+        };
+      }
+    }
+  }
 
   return {
     completedStoriesByTrack: Object.fromEntries(
@@ -192,6 +215,7 @@ function migrateLegacyData(raw: unknown): UserData {
         ),
       ])
     ),
+    completedNamesByTrack,
     reflections,
     pledges,
     activeTrackId:
@@ -250,7 +274,27 @@ export function completeStory(trackId: string, storyId: number): void {
   if (!data.dailyReads[today]) {
     data.dailyReads[today] = {
       trackId,
+      itemType: "story",
       storyId,
+      completedAt: new Date().toISOString(),
+    };
+  }
+  saveUserData(data);
+}
+
+export function completeName(trackId: string, nameId: string): void {
+  const data = getUserData();
+  const current = data.completedNamesByTrack[trackId] ?? [];
+  if (!current.includes(nameId)) {
+    data.completedNamesByTrack[trackId] = [...current, nameId];
+  }
+  data.activeTrackId = trackId;
+  const today = getTodayString();
+  if (!data.dailyReads[today]) {
+    data.dailyReads[today] = {
+      trackId,
+      itemType: "name",
+      nameId,
       completedAt: new Date().toISOString(),
     };
   }

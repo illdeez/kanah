@@ -12,6 +12,8 @@ import {
   getTrack,
   getTrackProgress,
   hasReadyStories,
+  isNamesTrack,
+  isWordTrack,
   toArabicNumeral,
 } from "@/data/days";
 import { getTodayRead, getUserData, isDevMode, isDevUnlimited, setActiveTrack, UserData } from "@/lib/storage";
@@ -47,17 +49,25 @@ export default function TrackPage() {
 
   useEffect(() => {
     if (!track) router.replace("/library");
-  }, [track, router]);
+    if (track && isNamesTrack(track)) {
+      router.replace(`/tracks/${trackId}/names`);
+    }
+  }, [track, trackId, router]);
 
   if (!userData || !track) return null;
+  if (isNamesTrack(track)) return null; // will redirect via useEffect
 
-  const isReady = hasReadyStories(track, devMode);
-  const progress = getTrackProgress(track.id, userData.completedStoriesByTrack);
+  // At this point TypeScript still has type Track; narrow to WordTrack
+  const wordTrack = isWordTrack(track) ? track : null;
+  if (!wordTrack) return null;
+
+  const isReady = hasReadyStories(wordTrack, devMode);
+  const progress = getTrackProgress(wordTrack.id, userData.completedStoriesByTrack);
   const todayRead = getTodayRead(userData);
   const hasDoneToday = !!todayRead && !devUnlimited;
   const nextStory = hasDoneToday
     ? null
-    : getNextAvailableStory(track.id, userData.completedStoriesByTrack, devMode);
+    : getNextAvailableStory(wordTrack.id, userData.completedStoriesByTrack, devMode);
 
   return (
     <main className="flex flex-col min-h-screen pb-10">
@@ -75,7 +85,7 @@ export default function TrackPage() {
               مسار الكلمة
             </p>
             <p className="text-[13px] font-semibold text-kanah-text truncate leading-tight">
-              {track.word}
+              {wordTrack.word}
             </p>
           </div>
         </div>
@@ -96,20 +106,20 @@ export default function TrackPage() {
           transition={{ ease, duration: 0.5 }}
           className="text-[34px] font-extrabold text-kanah-accent leading-[1.5] mb-3"
         >
-          {track.word}
+          {wordTrack.word}
         </motion.h1>
         <p className="text-[16px] text-kanah-text leading-[2] mb-3">
-          {track.subtitle}
+          {wordTrack.subtitle}
         </p>
         <p className="text-[14px] text-kanah-muted leading-[2] mb-6">
-          {track.description}
+          {wordTrack.description}
         </p>
 
         <div className="bg-kanah-card border border-kanah-border rounded-2xl p-5">
           <div className="flex items-center justify-between">
             <span className="text-[12px] text-kanah-locked">التقدّم</span>
             <span className="text-[14px] font-semibold text-kanah-accent">
-              {toArabicNumeral(progress)} من {toArabicNumeral(track.totalStories)}
+              {toArabicNumeral(progress)} من {toArabicNumeral(wordTrack.totalStories)}
             </span>
           </div>
         </div>
@@ -124,7 +134,7 @@ export default function TrackPage() {
       ) : nextStory ? (
         <section className="px-6 pb-8">
           <Link
-            href={`/tracks/${track.id}/stories/${nextStory.id}`}
+            href={`/tracks/${wordTrack.id}/stories/${nextStory.id}`}
             className="block w-full text-center py-4 rounded-2xl text-[16px] font-semibold bg-kanah-accent text-white shadow-accent active:scale-[0.98]"
           >
             {progress > 0 ? "تابع القصة المتاحة" : "ابدأ هذا المسار"}
@@ -142,9 +152,9 @@ export default function TrackPage() {
           animate="show"
           className="flex flex-col gap-3"
         >
-          {track.stories.map((story) => {
+          {wordTrack.stories.map((story) => {
             const status = getStoryStatus(
-              track.id,
+              wordTrack.id,
               story.id,
               userData.completedStoriesByTrack,
               devMode
@@ -208,7 +218,7 @@ export default function TrackPage() {
             if (!canOpen) return <div key={story.id}>{card}</div>;
 
             return (
-              <Link key={story.id} href={`/tracks/${track.id}/stories/${story.id}`}>
+              <Link key={story.id} href={`/tracks/${wordTrack.id}/stories/${story.id}`}>
                 {card}
               </Link>
             );

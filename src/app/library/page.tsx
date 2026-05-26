@@ -4,7 +4,16 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, Lock, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
-import { getTrackProgress, hasReadyStories, toArabicNumeral, wordTracks } from "@/data/days";
+import {
+  getTrackProgress,
+  getNamesTrackProgress,
+  hasReadyStories,
+  hasReadyNames,
+  isNamesTrack,
+  isWordTrack,
+  toArabicNumeral,
+  wordTracks,
+} from "@/data/days";
 import { getUserData, isDevMode, UserData } from "@/lib/storage";
 import BottomNav from "@/components/BottomNav";
 
@@ -53,12 +62,98 @@ export default function LibraryPage() {
         className="px-4 flex flex-col gap-4"
       >
         {wordTracks.map((track) => {
+          const isActive = userData.activeTrackId === track.id;
+
+          if (isNamesTrack(track)) {
+            const progress = getNamesTrackProgress(
+              track.id,
+              userData.completedNamesByTrack
+            );
+            const isReady = hasReadyNames(track, devMode);
+            const canClick = isReady;
+
+            const CardContent = (
+              <motion.div
+                variants={cardVariant}
+                whileTap={canClick ? { scale: 0.985 } : {}}
+                className={`bg-kanah-card rounded-2xl p-5 border transition-colors ${
+                  canClick
+                    ? "border-kanah-border shadow-sm"
+                    : "border-kanah-border opacity-45"
+                }`}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    {canClick ? (
+                      isActive ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-kanah-accent bg-kanah-accent-subtle px-2.5 py-1 rounded-full">
+                          <Sparkles size={11} />
+                          المسار النشط
+                        </span>
+                      ) : progress > 0 ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-kanah-completed bg-emerald-50 px-2.5 py-1 rounded-full">
+                          <CheckCircle2 size={11} />
+                          بدأت هذا المسار
+                        </span>
+                      ) : (
+                        <span className="text-[11px] font-semibold text-kanah-muted bg-kanah-surface px-2.5 py-1 rounded-full">
+                          متاح الآن
+                        </span>
+                      )
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-kanah-locked bg-kanah-border px-2.5 py-1 rounded-full">
+                        <Lock size={10} />
+                        قريباً
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[11px] text-kanah-locked">
+                    {toArabicNumeral(track.totalNames)} اسماً
+                  </span>
+                </div>
+
+                <p
+                  className={`text-[26px] font-extrabold leading-tight mb-2 ${
+                    canClick ? "text-kanah-accent" : "text-kanah-locked"
+                  }`}
+                >
+                  {track.word}
+                </p>
+
+                <p className="text-[14px] text-kanah-text leading-[1.9] mb-2">
+                  {track.subtitle}
+                </p>
+
+                <p className="text-[13px] text-kanah-muted leading-[1.9] mb-4">
+                  {track.description}
+                </p>
+
+                <div className="flex items-center justify-between text-[12px] text-kanah-locked">
+                  <span>
+                    {toArabicNumeral(progress)} من{" "}
+                    {toArabicNumeral(track.totalNames)}
+                  </span>
+                  <span>{progress > 0 ? "تقدّمك الحالي" : "لم تبدأ بعد"}</span>
+                </div>
+              </motion.div>
+            );
+
+            if (!canClick) return <div key={track.id}>{CardContent}</div>;
+
+            return (
+              <Link key={track.id} href={`/tracks/${track.id}/names`}>
+                {CardContent}
+              </Link>
+            );
+          }
+
+          // WordTrack
+          if (!isWordTrack(track)) return null;
           const progress = getTrackProgress(
             track.id,
             userData.completedStoriesByTrack
           );
           const isReady = hasReadyStories(track, devMode);
-          const isActive = userData.activeTrackId === track.id;
           const canClick = isReady;
 
           const CardContent = (
@@ -66,7 +161,9 @@ export default function LibraryPage() {
               variants={cardVariant}
               whileTap={canClick ? { scale: 0.985 } : {}}
               className={`bg-kanah-card rounded-2xl p-5 border transition-colors ${
-                canClick ? "border-kanah-border shadow-sm" : "border-kanah-border opacity-45"
+                canClick
+                  ? "border-kanah-border shadow-sm"
+                  : "border-kanah-border opacity-45"
               }`}
             >
               <div className="flex items-center justify-between mb-4">

@@ -1,26 +1,75 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Surfaces */
+  --color-kanah-bg: oklch(96% 0.014 74);
+  --color-kanah-card: oklch(99.2% 0.007 72);
+  --color-kanah-surface: oklch(93.8% 0.019 73);
+
+  /* Accent — deep sienna umber */
+  --color-kanah-accent: oklch(41.5% 0.094 47);
+  --color-kanah-accent-muted: oklch(62% 0.08 54);
+  --color-kanah-accent-subtle: oklch(96% 0.024 75);
+
+  /* Text */
+  --color-kanah-text: oklch(15.5% 0.022 50);
+  --color-kanah-muted: oklch(50% 0.02 60);
+  --color-kanah-locked: oklch(75% 0.012 62);
+
+  /* Structure */
+  --color-kanah-border: oklch(89% 0.015 71);
+  --color-kanah-completed: oklch(44% 0.09 155);
+
+  /* Shadows */
+  --shadow-accent: 0 4px 24px -4px oklch(41.5% 0.094 47 / 0.32);
+
+  /* Animations */
+  --animate-fade-in: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-up: fadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: oklch(91% 0.036 73);
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(89% 0.015 71);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

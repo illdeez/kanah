@@ -1,0 +1,1022 @@
+export interface StoryContent {
+  id: number;
+  storyNumber: number;
+  title: string;
+  readingTime: string;
+  story: string;
+  hiddenMeaning: string;
+  lifeImpact: string;
+  reflectionQuestion: string;
+  dailyAction: string;
+  selectedLines: string[];
+  pledgeText: string;
+  contentReady: boolean;
+}
+
+export interface WordTrack {
+  id: string;
+  type?: "wordTrack";
+  word: string;
+  subtitle: string;
+  description: string;
+  totalStories: number;
+  stories: StoryContent[];
+}
+
+export interface NameItem {
+  id: string;
+  number: number;
+  name: string;
+  title: string;
+  readingTime: string;
+  story: string;
+  hiddenMeaning: string;
+  lifeImpact: string;
+  reflectionQuestion: string;
+  dailyAction: string;
+  selectedLines: string[];
+  pledgeText: string;
+  contentReady: boolean;
+}
+
+export interface NamesTrack {
+  id: string;
+  type: "namesTrack";
+  word: string;
+  subtitle: string;
+  description: string;
+  totalNames: number;
+  names: NameItem[];
+}
+
+export type Track = WordTrack | NamesTrack;
+
+export function isNamesTrack(track: Track): track is NamesTrack {
+  return (track as NamesTrack).type === "namesTrack";
+}
+
+export function isWordTrack(track: Track): track is WordTrack {
+  return !isNamesTrack(track);
+}
+
+export type StoryStatus = "available" | "completed" | "locked";
+
+function createPlaceholderStory(
+  storyNumber: number,
+  title: string,
+  readingTime = "٤ دقائق"
+): StoryContent {
+  return {
+    id: storyNumber,
+    storyNumber,
+    title,
+    readingTime,
+    story: "",
+    hiddenMeaning: "",
+    lifeImpact: "",
+    reflectionQuestion: "",
+    dailyAction: "",
+    selectedLines: [],
+    pledgeText: "",
+    contentReady: false,
+  };
+}
+
+const kazmStories: StoryContent[] = [
+  {
+    id: 1,
+    storyNumber: 1,
+    title: "حين تقدر أن ترد… ولا تفعل",
+    readingTime: "٤ دقائق",
+    contentReady: true,
+    story: `في زحام السوق، رفع رجلٌ صوته فجأة في وجه بائع:
+
+"أنت سارق! بِعتني بضاعة فاسدة بالأمس!"
+
+في لحظة واحدة، صار السوق كله أذناً واحدة
+
+توقفت الأيدي عن العدّ، والتفتت الوجوه، ووجد البائع نفسه واقفاً في دائرة من العيون التي لا تنتظر الحقيقة فقط… بل تنتظر ردّه
+
+كان يعرف أن الرجل مخطئ
+يعرف أن البضاعة لم تكن منه أصلاً
+ويعرف أيضاً أنه يستطيع، بكلمة واحدة، أن يقلب الموقف كله عليه
+
+بل إن جملة قاسية مرّت في خاطره؛ جملة لو قالها لأسكتت الرجل فوراً، وربما كسرته أمام الناس
+
+شعر بالحرارة تصعد في صدره. أحسّ بقلبه ينبض في أذنيه. كانت الكلمات جاهزة على طرف لسانه، مرتبة، حادة، تنتظر إشارة واحدة لتخرج
+
+ثم… لم يفعل شيئاً
+
+أطرق قليلاً. أخذ نفساً واحداً طويلاً. ورفع عينيه إلى الرجل بهدوء، وقال:
+
+"تعال، اجلس. اشرب ماءً، ثم احكِ لي ما الذي حدث بالضبط"
+
+ارتبك الرجل. لم يكن يتوقع هذا. جلس وهو لا يزال مشدود الوجه، وبدأ يحكي، وكلما تكلم خفّ صوته، حتى بدأ يتضح له أن البضاعة لم تكن من هذا التاجر أصلاً
+
+اعتذر، وقام، وانصرف
+
+بقي البائع يرتب بضاعته بهدوء، كأن شيئاً لم يحدث
+
+لكن في داخله، كان قد ربح معركة لا يراها أحد`,
+    hiddenMeaning: `كظم الغيظ ليس أن تكون بارداً، ولا أن تكون ضعيفاً، ولا أن تتظاهر بأن شيئاً لم يحدث
+
+كظم الغيظ هو أن تشعر بالنار كاملةً في صدرك، وتعرف أنك تستطيع أن تحرق بها من أمامك، ثم تختار ألا تفعل
+
+أحياناً يكون لك حق في الرد، لكن ليس كل حقٍّ يصلح أن يُؤخذ في لحظة غضب
+
+اللحظة الحاسمة ليست حين لا تغضب، بل حين تغضب فعلاً، وتمتلك القدرة على الرد، فتختار أن تحفظ نفسك قبل أن تحفظ موقفك`,
+    lifeImpact: `أغلب ما نندم عليه لم يخرج منا في لحظة هدوء، بل في تلك الثانية القصيرة بين الاستفزاز والرد
+
+الكلمة التي قلتها لمن تحب. الرد الذي أرسلته لصديقك. التعليق الذي كتبته وأنت غاضب
+
+كلها كانت تستطيع أن تنتظر عشر دقائق فقط، وكانت ستختلف`,
+    reflectionQuestion: `متى كانت آخر مرة قلت كلمة وأنت غاضب، وتمنّيت بعدها لو سحبتها؟`,
+    dailyAction: `اليوم، إذا وصلتك رسالة استفزتك، أو سمعت كلاماً أغضبك، لا ترد فوراً
+
+انتظر عشر دقائق فقط. لا تكتب الرد خلال هذه الدقائق. اشرب ماءً، أو ابتعد عن الشاشة، ثم اسأل نفسك:
+
+هل أريد أن أرد لأصلح، أم لأنتقم؟
+
+ستكتشف أن نصف ما كنت ستقوله، لم يكن يستحق أن يُقال`,
+    selectedLines: [
+      "ليس كل حق يصلح أن يؤخذ في لحظة غضب",
+      "هل أريد أن أرد لأصلح، أم لأنتقم؟",
+      "كان قد ربح معركة لا يراها أحد",
+    ],
+    pledgeText:
+      "إذا استفزتني رسالة اليوم، لن أرد فوراً. سأنتظر عشر دقائق.",
+  },
+  {
+    id: 2,
+    storyNumber: 2,
+    title: "حين يكون الغضب جرح كرامة",
+    readingTime: "٤ دقائق",
+    contentReady: true,
+    story: `في مجلسٍ صغير، كان يتحدث بحماس عن فكرةٍ بقي يفكر فيها أياماً.
+
+رتّب كلامه في ذهنه، واختار كلماته بعناية، وانتظر اللحظة المناسبة ليقولها.
+
+بدأ يتكلم.
+
+لكن قبل أن يكمل جملته، قاطعه أحدهم، والتفت إلى شخص آخر، وبدأ حديثاً جديداً كأن الكلام الأول لم يكن مهماً.
+
+سكت.
+
+لم يكن السكوت هدوءاً. كان شيئاً آخر.
+
+شعر بحرارة خفيفة تصعد في وجهه. لم تكن المشكلة أن فكرته لم تُقبل، ولا أن أحداً خالفه. المشكلة أن أحداً مرّ فوق كلامه كأنه غير موجود.
+
+في داخله، بدأت جملة واحدة تكبر:
+
+"هو يظن أني لا أُحسب."
+
+ومن هذه الجملة، اشتعل الغضب.
+
+أراد أن يرد. أن يرفع صوته. أن يقول شيئاً يثبت به حضوره. شيئاً يجعلهم يلتفتون إليه ولو بالقوة.
+
+كانت عنده كلمات كثيرة. بعضها صحيح، وبعضها جارح. وكان يعرف أن الجارح منها سيصل أسرع.
+
+مدّ يده إلى كوب الماء أمامه، لا لأنه عطشان، بل لأنه احتاج شيئاً يمنعه من الكلام.
+
+شرب ببطء.
+
+ثم سأل نفسه في صمت:
+
+هل أغضب لأن الحق ضاع… أم لأن صورتي اهتزت؟
+
+لم تختفِ النار فوراً. بقي شيء منها في صدره.
+
+لكنه لأول مرة، لم يتعامل مع غضبه كأنه دليل على قوة موقفه. رآه كما هو: جرح كرامة يريد أن يلبس ثوب الحق.
+
+وبدل أن يقاطعهم بقسوة، انتظر حتى هدأ المجلس قليلاً، ثم قال بهدوء:
+
+"أظن أني لم أكمل فكرتي."
+
+هذه المرة، سمعوه.
+
+ولم يحتج أن يكسر أحداً ليثبت أنه موجود.`,
+    hiddenMeaning: `ليس كل غضب يبدأ من ظلم واضح. أحياناً يبدأ من شعور صغير بأننا لم نُحترم، أو لم نُرَ، أو لم يُحسب لنا حساب.
+
+وهنا يصبح كظم الغيظ أعمق من إيقاف اللسان. يصبح قدرة على أن ترى ما وراء غضبك: هل أنت تدافع عن حق، أم تضمد كرامة مجروحة؟
+
+ليس عيباً أن تتألم حين تُهان، لكن الخطر أن تجعل الألم قائداً للسانك.`,
+    lifeImpact: `في الرسائل، في المجالس، في البيت، وفي العمل، قد لا يغضبك الموقف نفسه بقدر ما يغضبك تفسيرك له.
+
+"تجاهلني."
+"استصغرني."
+"ما احترمني."
+
+قبل أن ترد، اسأل نفسك: هل أنا أبحث عن إصلاح الموقف، أم أريد أن أعيد لنفسي الشعور بالقيمة؟`,
+    reflectionQuestion:
+      "متى كانت آخر مرة غضبت لأنك شعرت أنك غير مُقدّر، لا لأن الحق ضاع فعلاً؟",
+    dailyAction:
+      "اليوم، إذا شعرت أن أحداً تجاهلك أو قلّل منك، لا ترد فوراً. سمِّ الشعور في داخلك أولاً: هل هو ظلم، أم جرح كرامة؟",
+    selectedLines: [
+      "هل أغضب لأن الحق ضاع… أم لأن صورتي اهتزت؟",
+      "رآه كما هو: جرح كرامة يريد أن يلبس ثوب الحق.",
+      "لم يحتج أن يكسر أحداً ليثبت أنه موجود.",
+    ],
+    pledgeText:
+      "إذا شعرت اليوم أن أحداً قلّل مني، سأسمّي الشعور أولاً قبل أن أرد: هل هو ظلم، أم جرح كرامة؟",
+  },
+  {
+    id: 3,
+    storyNumber: 3,
+    title: "الرسالة التي كادت تُرسل",
+    readingTime: "٤ دقائق",
+    contentReady: true,
+    story: `كان الهاتف في يده، والرسالة أمامه.
+
+قرأ الكلمات مرة، ثم أعاد قراءتها. لم تكن طويلة، لكنها كانت كافية لتوقظ شيئاً حاداً في صدره.
+
+"واضح أنك ما تفهم."
+
+جملة قصيرة، لكنها دخلت عليه كإهانة كاملة.
+
+فتح المحادثة بسرعة. بدأ يكتب.
+
+في البداية كتب رداً بسيطاً، ثم مسحه. لم يكن كافياً. أراد رداً أقوى. رداً يجعل الطرف الآخر يشعر بما شعر به.
+
+كتب جملة ساخرة. ثم أضاف بعدها جملة أشد. ثم ثالثة لا تشبهه في الأيام الهادئة، لكنها في تلك اللحظة بدت عادلة جداً.
+
+كان الإبهام قريباً من زر الإرسال.
+
+قريباً جداً.
+
+تخيّل وجه صاحبه وهو يقرأ الرد. تخيّل الصدمة. تخيّل كيف ستنقلب المحادثة كلها. وكان في داخله جزء صغير يريد ذلك.
+
+ثم توقف.
+
+لم يكن توقفه لأن الغضب اختفى. الغضب كان حاضراً، ثقيلاً، يدفعه دفعاً.
+
+لكنه سأل نفسه:
+
+هل أريد أن أوضح، أم أريد أن أوجع؟
+
+هذه الجملة أبطأت يده.
+
+قفل الهاتف، ووضعه على الطاولة. قام، توضأ، ثم عاد بعد عشر دقائق.
+
+قرأ الرد الذي كتبه.
+
+استغرب من نفسه.
+
+لم تكن رسالة توضيح. كانت عقوبة.
+
+حذفها كلها، وكتب بدلاً منها:
+
+"الكلمة ضايقتني. إذا تقصد توضح لي، وضح لي بدون تقليل."
+
+ضغط إرسال.
+
+لم تكن الرسالة ضعيفة. لكنها لم تكن سكيناً.
+
+وفي تلك اللحظة فهم أن كظم الغيظ أحياناً لا يكون في الفم، بل في الإبهام قبل أن يضغط.`,
+    hiddenMeaning: `الغضب في الرسائل أخطر لأنه يعطيك فرصة أن تكتب ما لا تستطيع قوله وجهاً لوجه. الشاشة تخفف حضور الإنسان الآخر، فتجعل الجرح أسهل.
+
+كظم الغيظ هنا ليس أن لا ترد أبداً، بل أن تفرق بين رد يصلح ورد ينتقم.
+
+قد يكون لك حق أن تتضايق، لكن ليس لك أن تجعل ألمك عذراً لإيذاء غيرك.`,
+    lifeImpact: `كثير من العلاقات لا تنكسر في المجالس، بل في المحادثات. كلمة مكتوبة في غضب تبقى أطول مما نظن.
+
+قبل أن ترسل، اقرأ ردك واسأل: هل هذا الكلام يشبهني وأنا هادئ؟ أم يشبه لحظة غضب عابرة تريد أن تترك أثراً دائماً؟`,
+    reflectionQuestion:
+      "متى كتبت رداً وأنت غاضب، ثم أدركت لاحقاً أنه كان انتقاماً لا توضيحاً؟",
+    dailyAction:
+      "اليوم، إذا كتبت رداً وأنت غاضب، لا ترسله فوراً. اتركه عشر دقائق، ثم اقرأه كأنك أنت من سيستقبله.",
+    selectedLines: [
+      "هل أريد أن أوضح، أم أريد أن أوجع؟",
+      "لم تكن رسالة توضيح. كانت عقوبة.",
+      "كظم الغيظ أحياناً لا يكون في الفم، بل في الإبهام قبل أن يضغط.",
+    ],
+    pledgeText:
+      "إذا كتبت اليوم رداً وأنا غاضب، لن أرسله فوراً. سأنتظر عشر دقائق ثم أراجعه.",
+  },
+  {
+    id: 4,
+    storyNumber: 4,
+    title: "حين يغضبك أقرب الناس",
+    readingTime: "٤ دقائق",
+    contentReady: true,
+    story: `عاد إلى البيت متعباً.
+
+كان يحمل في داخله يوماً طويلاً، وكلمات لم يقلها، وضغطاً لم يشرحه لأحد.
+
+دخل وهو يتمنى فقط أن يمرّ المساء بهدوء.
+
+لكن كلمة صغيرة من أحد أهل البيت كانت كافية لتشعل كل شيء.
+
+لم تكن الكلمة قاسية جداً. لو قالها غريب، ربما تجاوزها. لكن لأنها جاءت من قريب، دخلت أعمق.
+
+التفت بسرعة وقال:
+
+"أنت دائماً ما تفهمني."
+
+خرجت الجملة قبل أن يزنها.
+
+تغير وجه من أمامه.
+
+لم يكن الرد عن الكلمة الأولى فقط. كان عن تعب اليوم كله. عن تراكمات كثيرة. عن إحساس قديم بأنه لا يُقدّر. لكنه صبّه كله في وجه شخص يحبه.
+
+ساد صمت ثقيل.
+
+شعر أنه انتصر للحظة، ثم بدأ شيء في داخله يلين. رأى أثر كلمته في العين التي أمامه، وفهم أن الغضب إذا خرج على القريب، لا يجرح الموقف فقط، بل يجرح الأمان.
+
+أراد أن يبرر. أن يقول: أنا متعب. أنت بدأت. لم أقصد.
+
+لكنه سكت.
+
+هذه المرة لم يكن كظم الغيظ قبل الكلمة، بل بعدها. كظم رغبته في التبرير، وفي قلب الخطأ على غيره.
+
+قال بهدوء:
+
+"أنا رديت بطريقة غلط. تعبي ما يعطيني حق أجرحك."
+
+لم تُصلح الجملة كل شيء فوراً. لكنها أوقفت الضرر من أن يكبر.
+
+في تلك الليلة، فهم شيئاً قاسياً:
+
+أحياناً أصعب غيظ تكظمه ليس مع الغرباء، بل مع الذين تأمن وجودهم… فتظن أنهم سيتحملون حدّتك دائماً.`,
+    hiddenMeaning: `كظم الغيظ مع القريب أصعب، لأننا نخلط بين الأمان والإهمال. نطمئن إلى محبتهم، فنسمح لأنفسنا أن نقسو عليهم أكثر مما نقسو على الغرباء.
+
+لكن القرب ليس رخصة للجرح.
+
+ومن أعظم صور كظم الغيظ أن توقف اندفاعك مع من تحب، أو تعود سريعاً إذا أخطأت، قبل أن يتحول الغضب إلى عادة بينهم وبينك.`,
+    lifeImpact: `أحياناً نحفظ ألسنتنا أمام الناس، ثم نطلقها في البيت. نبدو هادئين في الخارج، ونصبح قاسين مع من لا نريد خسارتهم.
+
+راقب غضبك مع أهلك ومن تحب. ليس لأنهم ضعفاء، بل لأن أثر الكلمة القريبة يبقى قريباً.`,
+    reflectionQuestion:
+      "هل هناك شخص قريب منك يتحمل حدّتك لأنك اعتدت وجوده؟",
+    dailyAction:
+      "اليوم، إذا غضبت من شخص قريب، لا تستخدم كلمات عامة مثل: دائماً، أبداً، أنت ما تفهم. تكلم عن الموقف فقط، لا عن الشخص كله.",
+    selectedLines: [
+      "القرب ليس رخصة للجرح.",
+      "تعبي ما يعطيني حق أجرحك.",
+      "أصعب غيظ تكظمه ليس مع الغرباء، بل مع الذين تأمن وجودهم.",
+    ],
+    pledgeText:
+      "إذا غضبت اليوم من شخص قريب، سأنتبه ألا أجرح الشخص كله بسبب موقف واحد.",
+  },
+  {
+    id: 5,
+    storyNumber: 5,
+    title: "حين تُظلم ولا تستطيع التوضيح",
+    readingTime: "٤ دقائق",
+    contentReady: true,
+    story: `سمع اسمه في آخر الحديث.
+
+لم يكن حاضراً من البداية، لكنه فهم ما يكفي.
+
+كانوا يتحدثون عن خطأ حدث في العمل، وقد ظنوا أنه السبب. أحدهم قال بثقة:
+
+"هو الذي قصّر."
+
+توقف عند الباب.
+
+كان يستطيع أن يدخل فوراً. أن يقاطع. أن يشرح. أن يقول إنهم لا يعرفون الحقيقة كاملة.
+
+بل كان يستطيع أن يرفع صوته ويحرجهم كما أحرجوه في غيابه.
+
+لكن شيئاً في داخله كان أشد من مجرد الرغبة في التوضيح. كان يريد أن يرد لأن الظلم موجع، ولأن الاتهام إذا خرج أمام الناس كأنه يسرق منك صورتك.
+
+دخل بهدوء.
+
+التفتوا إليه. شعروا أنه سمع.
+
+ساد ارتباك قصير.
+
+قال أحدهم:
+
+"كنا نتكلم عن الموضوع."
+
+كان صدره مشتعلاً. كل كلمة جاهزة. كل دليل حاضر. لكنه عرف أن شرحه الآن، بهذا الغضب، قد يتحول إلى معركة، لا إلى بيان حقيقة.
+
+قال:
+
+"واضح أن في جزء ناقص من الصورة. خلونا نرتب الكلام بهدوء بعد الاجتماع."
+
+ثم جلس.
+
+لم يكن سهلاً. طوال الدقائق التالية كان يسمع في داخله صوتاً يقول: دافع عن نفسك الآن. لا تسكت. لا تتركهم يظنون.
+
+لكنه انتظر.
+
+بعد الاجتماع، جمع المعنيين، وشرح ما حدث بالأرقام والرسائل. اتضح أن الخطأ لم يكن منه.
+
+اعتذر أحدهم. لم يكن الاعتذار كبيراً كما تمنى، لكنه كان كافياً.
+
+خرج وهو يعلم أن السكوت المؤقت لم يكن ضعفاً. كان اختياراً لتوقيت لا يظلم الحقيقة بغضبه.`,
+    hiddenMeaning: `من أصعب الغيظ أن تُظلم ولا تستطيع توضيح كل شيء فوراً. في تلك اللحظة، يختلط الدفاع عن الحق بالرغبة في الانفجار.
+
+كظم الغيظ لا يعني أن تترك حقك، ولا أن تقبل الظلم. لكنه يعني أن لا تجعل غضبك يختار أسوأ وقت لقول الحقيقة.
+
+أحياناً تحفظ حقك أكثر حين تؤجل الرد حتى تهدأ.`,
+    lifeImpact: `في العمل، في الدراسة، في العائلة، قد تُفهم خطأ. وقد تشعر أن السكوت لحظة واحدة سيجعلك تخسر صورتك.
+
+لكن الرد الغاضب قد يجعل الناس يتذكرون انفعالك أكثر من حجتك.
+
+اختر وقتاً ينصر الحقيقة، لا وقتاً يريح غضبك فقط.`,
+    reflectionQuestion:
+      "هل سبق أن دافعت عن نفسك بطريقة جعلت غضبك يغطي على حقك؟",
+    dailyAction:
+      "اليوم، إذا شعرت أنك فُهمت خطأ، لا تشرح وأنت مشتعل. قل بهدوء: أحتاج أوضح الصورة، ثم اختر وقتاً أصلح للكلام.",
+    selectedLines: [
+      "السكوت المؤقت لم يكن ضعفاً. كان اختياراً لتوقيت لا يظلم الحقيقة بغضبه.",
+      "لا تجعل غضبك يختار أسوأ وقت لقول الحقيقة.",
+      "اختر وقتاً ينصر الحقيقة، لا وقتاً يريح غضبك فقط.",
+    ],
+    pledgeText:
+      "إذا شعرت اليوم أنني فُهمت خطأ، سأختار وقتاً هادئاً للتوضيح بدل أن أشرح وأنا مشتعل.",
+  },
+  {
+    id: 6,
+    storyNumber: 6,
+    title: "الصمت الذي أنقذك",
+    readingTime: "٤ دقائق",
+    contentReady: true,
+    story: `كان النقاش بسيطاً في أوله.
+
+رأي، ثم رد، ثم اعتراض. لا شيء يستحق أن يتحول إلى خصومة.
+
+لكن نبرة أحدهم تغيّرت.
+
+قال كلمة فيها سخرية خفيفة. ليست شتيمة واضحة، لكنها كافية لتفتح باباً لا يُغلق بسهولة.
+
+ابتسم بعض الحاضرين.
+
+وهنا اشتعل شيء في صدره.
+
+ليس بسبب الرأي، بل بسبب الابتسامة. بسبب شعوره أن الناس رأوا الإهانة، وينتظرون هل سيرد أم لا.
+
+كان يستطيع أن يرد بسرعة. وكان يعرف تماماً أين يضرب. يعرف نقطة ضعف الشخص أمامه، ويعرف جملة لو قالها لانتهى النقاش لصالحه.
+
+فتح فمه قليلاً.
+
+ثم أغلقه.
+
+نظر إلى الأرض لحظة، ثم قال:
+
+"خلونا نرجع لأصل الموضوع."
+
+لم يكن صمته جميلاً من الداخل. كان ثقيلاً. كان كأنه يمسك باباً تدفعه ريح قوية.
+
+الشخص الآخر كرر السخرية، كأنه يستدرجه.
+
+هذه المرة، كان الرد أقرب.
+
+لكنه سكت أيضاً.
+
+بعد دقائق، انتهى النقاش. خرج الناس. وانطفأ الموقف.
+
+في الطريق، مشى وحده وهو لا يشعر بانتصار كبير. كان في داخله شيء يقول: كان يجب أن ترد. كان يجب أن يعرف حدّه.
+
+لكن بعد ساعات، حين هدأ تماماً، تذكر الجملة التي كان سيقولها.
+
+تخيل لو خرجت.
+
+تخيل الوجه الذي كان سيتغير. العلاقة التي كانت ستنكسر. المجلس الذي كان سيتحول إلى قصة تُروى.
+
+عندها فقط فهم:
+
+أحياناً لا تشعر بقيمة الصمت في لحظته. تعرف قيمته لاحقاً، حين ترى الخراب الذي لم يحدث.`,
+    hiddenMeaning: `الصمت ليس دائماً هروباً. أحياناً يكون الصمت أعلى درجات السيطرة، خاصة حين تكون قادراً على الرد.
+
+الكلمة التي لا تقولها وأنت غاضب قد تكون أعظم عمل قمت به في ذلك اليوم، حتى لو لم يمدحك أحد، وحتى لو ظن بعض الناس أنك خسرت الموقف.
+
+ليس كل انتصار يحتاج أن يسمعه الآخرون.`,
+    lifeImpact: `هناك مواقف لا تحتاج رداً، بل تحتاج أن تمرّ دون أن تترك جرحاً جديداً.
+
+في المجالس والمحادثات، قد يستفزك شخص فقط ليجرك إلى صورته. إذا دخلت معه بنفس النبرة، فقد خسرتم الاثنين.
+
+الصمت الواعي لا يعني أنك لا تملك جواباً. يعني أنك لا تريد أن تدفع قلبك ثمناً لموقف صغير.`,
+    reflectionQuestion:
+      "متى كان صمتك سيحميك من كلمة كانت ستكبر أكثر من الموقف نفسه؟",
+    dailyAction:
+      "اليوم، إذا استفزك أحد بكلمة ساخرة، لا ترد على النبرة فوراً. أعد الحديث إلى أصل الموضوع، أو انسحب بهدوء.",
+    selectedLines: [
+      "أحياناً لا تشعر بقيمة الصمت في لحظته.",
+      "الكلمة التي لا تقولها وأنت غاضب قد تكون أعظم عمل قمت به في ذلك اليوم.",
+      "ليس كل انتصار يحتاج أن يسمعه الآخرون.",
+    ],
+    pledgeText:
+      "إذا استفزني أحد اليوم بسخرية، لن أرد على النبرة فوراً. سأعيد الحديث لأصل الموضوع أو أنسحب بهدوء.",
+  },
+  {
+    id: 7,
+    storyNumber: 7,
+    title: "حين تكظم غيظك لله",
+    readingTime: "٤ دقائق",
+    contentReady: true,
+    story: `في البداية، كان يكظم غيظه حتى لا يخسر صورته.
+
+كان يقول لنفسه: لا ترد، سيقولون إنك عصبي. لا ترفع صوتك، سيظنون أنك ضعيف الحجة. كن هادئاً حتى تظهر أقوى.
+
+وكان ينجح أحياناً.
+
+لكن في داخله، كان ينتظر أن يلاحظ أحد.
+
+ينتظر أن يقولوا: ما شاء الله، صبور. هادئ. كبير العقل.
+
+وفي يوم، حدث موقف لم يره أحد.
+
+كان وحده تقريباً حين جاءه كلام جارح من شخص قريب. لم يكن هناك جمهور، ولا مجلس، ولا أحد سيشهد هدوءه إن سكت.
+
+اشتعل غضبه.
+
+وهذه المرة لم يكن هناك ما يحمي صورته أمام الناس. لا أحد سيراه إن كظم. لا أحد سيصفق له. لا أحد سيقول: أحسنت.
+
+كان يستطيع أن يرد، ولن يعرف أحد. يستطيع أن يجرح، ثم يبدو أمام الناس كما هو.
+
+هنا ظهر السؤال الحقيقي:
+
+لمن أكظم غيظي؟
+
+للناس؟ لصورة الهدوء؟ لشعور التفوق؟
+
+أم لله؟
+
+بقي صامتاً قليلاً. لم يكن صمته هذه المرة تمثيلاً للوقار. كان مجاهدة داخلية لا يراها إلا الله.
+
+كتب رداً، ثم مسحه.
+
+ثم قال فقط:
+
+"سأرد عليك لاحقاً عندما أهدأ."
+
+أغلق الهاتف.
+
+لم يشعر بانتصار عظيم فوراً. لكن في داخله كان هناك معنى مختلف. لأول مرة، لم يكن ينتظر شاهداً من الناس.
+
+كان يكفيه أن الله رأى اللحظة التي لم يرها أحد.`,
+    hiddenMeaning: `قد نكظم غيظنا أحياناً لأن الناس تنظر، أو لأننا نريد أن نحافظ على صورتنا. وهذا أفضل من الانفجار، لكنه ليس أعمق المعنى.
+
+أعمق كظم الغيظ أن تكظم وأنت قادر، ولا يراك أحد، ولا تنتظر مدحاً، فقط لأن الله يحب منك أن تملك نفسك.
+
+هنا يتحول الخلق من صورة أمام الناس إلى عبادة خفية.`,
+    lifeImpact: `اسأل نفسك: هل أكون أهدأ أمام الغرباء منّي أمام أهلي؟ هل أتحكم في غضبي إذا كان هناك من يشاهد، وأطلقه إذا كنت وحدي؟
+
+المواقف الخفية تكشف صدق الخلق. ليس لأننا لا نخطئ، بل لأنها تبين لمن نفعل الخير حين لا يصفق لنا أحد.`,
+    reflectionQuestion:
+      "هل سبق أن تركت رداً جارحاً لا لأن الناس ستراك، بل لأن الله يراك؟",
+    dailyAction:
+      "اليوم، إذا كظمت غيظك في موقف لا يراه أحد، ذكّر نفسك بهدوء: هذا بيني وبين الله.",
+    selectedLines: [
+      "لمن أكظم غيظي؟",
+      "كان يكفيه أن الله رأى اللحظة التي لم يرها أحد.",
+      "هنا يتحول الخلق من صورة أمام الناس إلى عبادة خفية.",
+    ],
+    pledgeText:
+      "إذا كظمت غيظي اليوم في موقف لا يراه أحد، سأجعله لله لا لصورة الناس عني.",
+  },
+  {
+    id: 8,
+    storyNumber: 8,
+    title: "المعركة التي لا يراها أحد",
+    readingTime: "٤ دقائق",
+    contentReady: true,
+    story: `من الخارج، بدا الموقف عادياً جداً.
+
+شخص قال كلمة ضايقته. هو سكت. انتهى الأمر.
+
+هكذا رآه الناس.
+
+لكنهم لم يروا ما حدث في الداخل.
+
+لم يروا كيف تسارعت أنفاسه. كيف عادت إليه مواقف قديمة في لحظة واحدة. كيف صار صدره ضيقاً كأن الكلمة الصغيرة فتحت باباً على كل ما كتمه من قبل.
+
+لم يروا الردود التي تزاحمت في رأسه.
+
+لم يروا الجملة التي كادت تخرج. الجملة التي كانت ستؤذي، وتنتصر، وتترك ندماً طويلاً.
+
+لم يروا يده وهي تنقبض تحت الطاولة.
+
+ولم يروا اللحظة التي اختار فيها ألا يقولها.
+
+بعد الموقف، قال له أحدهم:
+
+"أنت ما تأثرت، واضح."
+
+ابتسم ابتسامة خفيفة.
+
+لم يعرف كيف يشرح أن عدم الانفجار لا يعني عدم الألم. وأن الهدوء الظاهر أحياناً يخفي معركة كاملة.
+
+مشى بعد ذلك وحده.
+
+كان لا يزال يشعر ببقايا الغضب، لكنه شعر أيضاً بشيء آخر. ليس فخراً صاخباً، بل طمأنينة صغيرة.
+
+لقد حدثت معركة، ولم يعرف بها أحد.
+
+كان يستطيع أن يخسر نفسه فيها، لكنه لم يفعل.
+
+وفي تلك اللحظة فهم أن بعض أعظم انتصارات الإنسان لا تدخل في أحاديث الناس، ولا تُذكر في المجالس، ولا يصفق لها أحد.
+
+لكنها تُكتب في داخله.
+
+مرة بعد مرة، يصبح أقدر على نفسه.
+
+ومرة بعد مرة، لا تعود النار تقوده كما كانت.`,
+    hiddenMeaning: `لا يراك الناس دائماً وأنت تجاهد نفسك. قد يحكمون على هدوئك بأنه سهل، أو يظنون أنك لم تتأثر.
+
+لكن الله يعلم ما كظمت، وما ابتلعت، وما تركت قوله وأنت قادر عليه.
+
+كظم الغيظ ليس لحظة شكلية، بل تدريب خفي. كل مرة تمسك نفسك فيها، تضعف سلطة الغضب عليك قليلاً.`,
+    lifeImpact: `لا تنتظر أن يفهم الناس دائماً حجم المعركة التي خضتها داخلك. يكفي أن تكون أنت أصدق مع نفسك.
+
+إذا مرّ موقف وكظمت فيه غيظك، لا تقلل من ذلك لأن أحداً لم يلاحظ. ربما كانت تلك اللحظة الصغيرة بداية تغير كبير فيك.`,
+    reflectionQuestion:
+      "ما المعركة الداخلية التي خضتها مؤخراً ولم يعرف أحد كم كانت صعبة عليك؟",
+    dailyAction:
+      "اليوم، إذا كظمت غيظك في موقف صغير، لا تحتقره. سمّه في داخلك: هذه معركة ربحتها.",
+    selectedLines: [
+      "عدم الانفجار لا يعني عدم الألم.",
+      "بعض أعظم انتصارات الإنسان لا تدخل في أحاديث الناس.",
+      "كل مرة تمسك نفسك فيها، تضعف سلطة الغضب عليك قليلاً.",
+    ],
+    pledgeText:
+      "إذا كظمت غيظي اليوم في موقف صغير، لن أحتقره. سأراه تدريباً على امتلاك نفسي.",
+  },
+  {
+    id: 9,
+    storyNumber: 9,
+    title: "هل كان غضباً أم كبرياء؟",
+    readingTime: "٤ دقائق",
+    contentReady: true,
+    story: `كان يكرر في داخله:
+
+"أنا فقط أريد حقي."
+
+قالها مرة، ثم مرة، ثم مرة.
+
+لكن كلما أعادها، شعر أن في الجملة شيئاً ناقصاً.
+
+الموقف بدأ بسيطاً. أحدهم صحح له خطأ أمام الآخرين. لم يكن التصحيح قاسياً جداً، لكنه جاء في وقت لم يتوقعه، وبطريقة شعر أنها أنقصت منه.
+
+ابتسم في البداية، ثم سكت.
+
+لكن داخله لم يسكت.
+
+بدأ يجهز رداً طويلاً. ليس عن الخطأ فقط، بل عن الشخص نفسه. عن أسلوبه. عن مواقفه القديمة. عن كل شيء يستطيع أن يجمعه ليعيد التوازن.
+
+كان يقول لنفسه: سأرد لأجل الحق.
+
+لكن حين جلس وحده، وهدأ قليلاً، تذكر شيئاً.
+
+التصحيح كان صحيحاً.
+
+الخطأ كان موجوداً فعلاً.
+
+إذن لماذا اشتعل بهذا الشكل؟
+
+سأل نفسه بصعوبة:
+
+هل آلمني الخطأ… أم آلمني أن الناس رأوا خطئي؟
+
+لم يحب السؤال. كان قاسياً. لكنه كان صادقاً.
+
+اكتشف أن غضبه لم يكن كله دفاعاً عن الحق. كان فيه حق، نعم. لكنه كان ممزوجاً بكبرياء مجروح يريد أن ينتقم من الإحراج.
+
+في اليوم التالي، رأى الشخص نفسه.
+
+كان يستطيع أن يفتح الموضوع بحدة، لكنه قال:
+
+"تصحيحك كان في محله، لكن طريقة الكلام أمام الناس ضايقتني."
+
+كانت جملة صعبة. لأنها لم تجعله ضحية كاملة، ولم تجعل الآخر عدواً كاملاً.
+
+لكنها كانت أصدق.
+
+وفهم يومها أن كظم الغيظ لا يعني فقط أن تسكت، بل أن تفتش في غضبك: كم فيه من حق، وكم فيه من نفس؟`,
+    hiddenMeaning: `أخطر الغضب ما كان فيه جزء من الحق. لأنه يجعلنا نطمئن لانفعالنا، ونقول: أنا مظلوم، أنا صاحب حق.
+
+لكن وجود حق في الموقف لا يعني أن كل غضبك نقي. قد يختلط الحق بالكبرياء، وقد تطلب الإنصاف بطريقة تنتقم بها لصورتك.
+
+كظم الغيظ يبدأ حين تجرؤ أن تسأل نفسك: هل أغضب لله، للحق، أم لنفسي؟`,
+    lifeImpact: `في كل خلاف، حاول أن تفصل بين أمرين: ما الخطأ الحقيقي؟ وما الجرح الشخصي الذي أضفته أنت إلى الموقف؟
+
+هذا لا يعني أن تلغي حقك، بل يعني أن تطالب به وأنت أكثر صدقاً وأقل اندفاعاً.`,
+    reflectionQuestion:
+      "في آخر مرة غضبت فيها، كم كان غضبك للحق، وكم كان لصورتك أمام الناس؟",
+    dailyAction:
+      "اليوم، إذا غضبت، اكتب في ذهنك سببين: السبب الظاهر لغضبي، والسبب الخفي الذي قد لا أحب الاعتراف به.",
+    selectedLines: [
+      "هل آلمني الخطأ… أم آلمني أن الناس رأوا خطئي؟",
+      "وجود حق في الموقف لا يعني أن كل غضبك نقي.",
+      "كم فيه من حق، وكم فيه من نفس؟",
+    ],
+    pledgeText:
+      "إذا غضبت اليوم، سأفتش في غضبي: كم فيه من حق، وكم فيه من كبرياء؟",
+  },
+  {
+    id: 10,
+    storyNumber: 10,
+    title: "حين تصير الكلمة خُلقاً",
+    readingTime: "٤ دقائق",
+    contentReady: true,
+    story: `لم يحدث التغيير فجأة.
+
+لم يستيقظ يوماً فيجد نفسه حليماً، هادئاً، لا يغضب.
+
+كان يغضب كما كان. يشعر بالحرارة نفسها أحياناً. تأتيه الكلمات الحادة نفسها. يشتعل صدره في المواقف الصغيرة كما كان يحدث من قبل.
+
+لكن شيئاً واحداً بدأ يتغير.
+
+صار يلاحظ اللحظة.
+
+تلك المسافة القصيرة بين أن يُستفز وأن يرد.
+
+في السابق، كانت تمرّ بسرعة لا يراها. يسمع الكلمة، فيرد. تصله الرسالة، فيكتب. يشعر بالإهانة، فيجرح.
+
+أما الآن، فقد صار يرى الباب قبل أن يفتحه.
+
+مرة سكت.
+
+ومرة كتب رداً ثم مسحه.
+
+ومرة قال: سأرد لاحقاً.
+
+ومرة اعتذر لأنه انفعل.
+
+ومرة اكتشف أن غضبه كان كبرياءً لا حقاً.
+
+لم تكن كل الأيام ناجحة. بعض الأيام غلبه الغضب، وقال ما لا يحب. لكنه لم يعد يمرّ على ذلك كأنه شيء عادي. صار يرجع، يراجع، ويحاول من جديد.
+
+وبعد مدة، قال له شخص قريب:
+
+"أنت تغيّرت. صرت تهدأ أسرع."
+
+لم يعرف ماذا يقول.
+
+لم يكن التغيير معجزة. كان ثمرة معارك صغيرة لا يعرفها أحد. لحظات كثيرة اختار فيها ألا يجعل الغضب قائده الوحيد.
+
+ابتسم وقال:
+
+"ما زلت أتعلم."
+
+وكان صادقاً.
+
+فكظم الغيظ ليس درساً تقرؤه مرة، ولا قصة تعجبك ثم تنساها. هو كلمة تعيش معها حتى تصبح أبطأ في الأذى، وأسرع في الرجوع، وأصدق مع نفسك حين تغضب.
+
+وحين تصير الكلمة خُلقاً، لا تحتاج أن تتذكرها كثيراً.
+
+ستظهر فيك.`,
+    hiddenMeaning: `الخلق لا يتكون من موقف واحد. يتكون من تكرار صغير، ومجاهدة متكررة، ورجوع بعد الخطأ.
+
+كظم الغيظ ليس أن لا تغضب أبداً، بل أن لا يبقى الغضب سيدك كما كان. أن ترى اللحظة، وتملك جزءاً أكبر من نفسك كل مرة.
+
+وحين تعيش الكلمة أياماً، لا تبقى معنى في ذهنك فقط. تبدأ تتحول إلى طريقة في النظر والرد والسكوت.`,
+    lifeImpact: `لا تقسُ على نفسك إذا لم تنجح كل مرة. المهم ألا تبقى كما أنت.
+
+اسأل نفسك بعد هذه الرحلة: هل صرت ترى غضبك أبكر؟ هل صار بين الاستفزاز والرد مسافة ولو صغيرة؟ هذه المسافة هي بداية الخلق.`,
+    reflectionQuestion:
+      "ما الشيء الصغير الذي تغيّر في علاقتك بالغضب بعد هذه الرحلة؟",
+    dailyAction:
+      "اليوم، راقب لحظة واحدة فقط قبل الرد. لا تطلب من نفسك الكمال. فقط وسّع المسافة بين الغضب والكلمة.",
+    selectedLines: [
+      "صار يرى الباب قبل أن يفتحه.",
+      "كظم الغيظ ليس أن لا تغضب أبداً، بل أن لا يبقى الغضب سيدك كما كان.",
+      "وحين تصير الكلمة خُلقاً، لا تحتاج أن تتذكرها كثيراً. ستظهر فيك.",
+    ],
+    pledgeText:
+      "اليوم، سأحاول أن أوسّع المسافة بين الغضب والكلمة، ولو للحظة واحدة.",
+  },
+];
+
+const sadaqahStories = Array.from({ length: 10 }, (_, index) =>
+  createPlaceholderStory(index + 1, `قصة ${toArabicNumeral(index + 1)} من مسار الصدقة`)
+);
+
+// 99 Names of Allah — all contentReady: false until content is written
+const asmaNames: NameItem[] = [
+  { id: "al-rahman", number: 1, name: "الرحمن", title: "واسع الرحمة للجميع", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-rahim", number: 2, name: "الرحيم", title: "خاص الرحمة بالمؤمنين", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-malik", number: 3, name: "الملك", title: "المالك الحقيقي لكل شيء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-quddus", number: 4, name: "القدوس", title: "المنزّه عن كل نقص", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-salam", number: 5, name: "السلام", title: "مصدر السلام ومانحه", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-mumin", number: 6, name: "المؤمن", title: "المصدّق المانح الأمان", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-muhaymin", number: 7, name: "المهيمن", title: "الرقيب الحافظ لكل شيء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-aziz", number: 8, name: "العزيز", title: "القوي الغالب الذي لا يُقهر", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-jabbar", number: 9, name: "الجبار", title: "الذي يجبر الكسير ويُصلحه", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-mutakabbir", number: 10, name: "المتكبر", title: "العظيم الجليل فوق كل شيء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-khaliq", number: 11, name: "الخالق", title: "المبدع الموجد من العدم", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-bari", number: 12, name: "البارئ", title: "المُفرّق المميّز للمخلوقات", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-musawwir", number: 13, name: "المصور", title: "الذي يُصوّر الخلق كيف يشاء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-ghaffar", number: 14, name: "الغفار", title: "كثير المغفرة لعباده", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-qahhar", number: 15, name: "القهار", title: "الغالب الذي يقهر كل شيء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-wahhab", number: 16, name: "الوهاب", title: "الكثير العطاء بلا حساب", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-razzaq", number: 17, name: "الرزاق", title: "الذي يرزق كل مخلوق", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-fattah", number: 18, name: "الفتاح", title: "فاتح الأبواب والأرزاق", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-alim", number: 19, name: "العليم", title: "المحيط علمه بكل شيء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-qabid", number: 20, name: "القابض", title: "الذي يقبض الأرواح والأرزاق", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-basit", number: 21, name: "الباسط", title: "الذي يبسط الرزق ويوسّعه", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-khafid", number: 22, name: "الخافض", title: "الذي يخفض ويُذلّ الجبابرة", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-rafi", number: 23, name: "الرافع", title: "الرافع لأوليائه درجات", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-muizz", number: 24, name: "المعز", title: "المُعزّ من يشاء من عباده", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-mudhill", number: 25, name: "المذل", title: "المُذلّ للمتكبرين", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-sami", number: 26, name: "السميع", title: "المستمع لكل قول وخافية", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-basir", number: 27, name: "البصير", title: "المُبصِر لكل شيء ظاهر وخفي", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-hakam", number: 28, name: "الحكم", title: "الحاكم العدل بين عباده", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-adl", number: 29, name: "العدل", title: "العادل في كل حكم وقضاء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-latif", number: 30, name: "اللطيف", title: "اللطيف بعباده الخبير بهم", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-khabir", number: 31, name: "الخبير", title: "العليم بخفايا الأمور", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-halim", number: 32, name: "الحليم", title: "الصبور الذي لا يعجّل بالعقوبة", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-azim", number: 33, name: "العظيم", title: "المتصف بكل صفات الكمال", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-ghafur", number: 34, name: "الغفور", title: "الستّار لذنوب العباد", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-shakur", number: 35, name: "الشكور", title: "المُجازي على القليل بالكثير", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-ali", number: 36, name: "العلي", title: "المرتفع فوق كل مخلوق", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-kabir", number: 37, name: "الكبير", title: "الكبير الذي لا شيء أكبر منه", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-hafiz", number: 38, name: "الحفيظ", title: "الحافظ لكل شيء بعلمه", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-muqit", number: 39, name: "المقيت", title: "الموصل الأقوات لكل مخلوق", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-hasib", number: 40, name: "الحسيب", title: "الكافي المحاسب لكل شيء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-jalil", number: 41, name: "الجليل", title: "العظيم في صفاته وجلاله", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-karim", number: 42, name: "الكريم", title: "الجواد الذي لا ينفد عطاؤه", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-raqib", number: 43, name: "الرقيب", title: "المُطّلع على كل شيء دائماً", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-mujib", number: 44, name: "المجيب", title: "المستجيب لدعاء عباده", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-wasi", number: 45, name: "الواسع", title: "الواسع رحمةً وعلماً وعطاءً", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-hakim", number: 46, name: "الحكيم", title: "الذي يضع كل شيء في موضعه", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-wadud", number: 47, name: "الودود", title: "المحبّ لعباده الصالحين", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-majid", number: 48, name: "المجيد", title: "الشريف الرفيع في ذاته وصفاته", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-baith", number: 49, name: "الباعث", title: "الذي يبعث الخلق يوم القيامة", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-shahid", number: 50, name: "الشهيد", title: "الحاضر شاهداً على كل شيء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-haqq", number: 51, name: "الحق", title: "الثابت الوجود الحق دائماً", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-wakil", number: 52, name: "الوكيل", title: "الكافل بأمور من توكّل عليه", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-qawi", number: 53, name: "القوي", title: "الكامل القوة الذي لا يُغلب", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-matin", number: 54, name: "المتين", title: "الشديد القوة لا يتعب ولا يعيى", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-wali", number: 55, name: "الولي", title: "الناصر المتولي أمور عباده", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-hamid", number: 56, name: "الحميد", title: "المستحق للحمد والثناء دائماً", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-muhsi", number: 57, name: "المحصي", title: "العالم بعدد كل شيء دقيقه وجليله", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-mubdi", number: 58, name: "المبدئ", title: "الذي بدأ الخلق أول مرة", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-muid", number: 59, name: "المعيد", title: "الذي يُعيد الخلق بعد فنائه", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-muhyi", number: 60, name: "المحيي", title: "الذي يهب الحياة لمن يشاء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-mumit", number: 61, name: "المميت", title: "الذي يُميت الخلق بأمره", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-hayy", number: 62, name: "الحي", title: "الحي الدائم الذي لا يموت", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-qayyum", number: 63, name: "القيوم", title: "القائم بذاته القيّم على غيره", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-wajid", number: 64, name: "الواجد", title: "الغني الذي لا يفتقر لشيء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-majid-2", number: 65, name: "الماجد", title: "العالي القدر الواسع الجود", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-wahid", number: 66, name: "الواحد", title: "الفرد الذي لا شريك له", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-ahad", number: 67, name: "الأحد", title: "المتفرد الذي لا مثيل له", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-samad", number: 68, name: "الصمد", title: "المقصود في كل الحاجات", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-qadir", number: 69, name: "القادر", title: "المتمكن القادر على كل شيء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-muqtadir", number: 70, name: "المقتدر", title: "الشديد القدرة النافذ الأمر", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-muqaddim", number: 71, name: "المقدم", title: "الذي يُقدّم من يشاء بحكمته", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-muakhkhir", number: 72, name: "المؤخر", title: "الذي يُؤخّر من يشاء بعدله", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-awwal", number: 73, name: "الأول", title: "الذي ليس قبله شيء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-akhir", number: 74, name: "الآخر", title: "الذي ليس بعده شيء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-zahir", number: 75, name: "الظاهر", title: "الظاهر بآياته فوق كل شيء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-batin", number: 76, name: "الباطن", title: "المحتجب عن أبصار الخلق", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-wali-2", number: 77, name: "الوالي", title: "المتولي تدبير أمور الكون", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-mutaali", number: 78, name: "المتعال", title: "المتعالي عن صفات المخلوقين", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-barr", number: 79, name: "البر", title: "الكثير البرّ والإحسان لعباده", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-tawwab", number: 80, name: "التواب", title: "الكثير قبول التوبة من عباده", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-muntaqim", number: 81, name: "المنتقم", title: "المنتقم من أعدائه بالعدل", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-afuww", number: 82, name: "العفو", title: "الكثير العفو والمحو للذنوب", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-rauf", number: 83, name: "الرؤوف", title: "الرحيم الشديد الرأفة بعباده", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "malik-al-mulk", number: 84, name: "مالك الملك", title: "المالك الحقيقي لكل الملك", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "dhu-al-jalal", number: 85, name: "ذو الجلال والإكرام", title: "صاحب العظمة والجلال والكرم", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-muqsit", number: 86, name: "المقسط", title: "العادل الذي لا يجور على أحد", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-jami", number: 87, name: "الجامع", title: "الذي يجمع الخلق يوم الحساب", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-ghani", number: 88, name: "الغني", title: "الغني عن كل شيء والكل محتاج إليه", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-mughni", number: 89, name: "المغني", title: "المُغني لعباده من فضله", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-mani", number: 90, name: "المانع", title: "الذي يمنع ما يشاء بحكمته", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-darr", number: 91, name: "الضار", title: "الذي يُنزل الضرر بمن يشاء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-nafi", number: 92, name: "النافع", title: "الذي يجلب النفع لمن يشاء", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-nur", number: 93, name: "النور", title: "نور السموات والأرض وما فيها", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-hadi", number: 94, name: "الهادي", title: "الذي يهدي من يشاء إلى الحق", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-badi", number: 95, name: "البديع", title: "المبدع المُنشئ للخلق بلا مثال", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-baqi", number: 96, name: "الباقي", title: "الدائم الذي لا يفنى أبداً", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-warith", number: 97, name: "الوارث", title: "الوارث لكل شيء بعد فناء الخلق", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-rashid", number: 98, name: "الرشيد", title: "الهادي الموصل للرشاد والصواب", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+  { id: "al-sabur", number: 99, name: "الصبور", title: "الذي لا يُعجّل بالعقوبة لمن يعصيه", readingTime: "٤ دقائق", story: "", hiddenMeaning: "", lifeImpact: "", reflectionQuestion: "", dailyAction: "", selectedLines: [], pledgeText: "", contentReady: false },
+];
+
+export const wordTracks: Track[] = [
+  {
+    id: "kazm-al-ghayz",
+    type: "wordTrack",
+    word: "كظم الغيظ",
+    subtitle: "أن تملك نفسك حين تقدر على الرد",
+    description: "رحلة من ١٠ قصص مستقلة تعيد تشكيل علاقتك بالغضب من الداخل.",
+    totalStories: 10,
+    stories: kazmStories,
+  },
+  {
+    id: "sadaqah",
+    type: "wordTrack",
+    word: "الصدقة",
+    subtitle: "أن ترى العطاء قبل أن تراه يدك",
+    description: "مسار قادم من ١٠ قصص يعلّمك كيف يتحول البذل إلى خلق يومي.",
+    totalStories: 10,
+    stories: sadaqahStories,
+  },
+  {
+    id: "asma-allah-al-husna",
+    type: "namesTrack",
+    word: "أسماء الله الحسنى",
+    subtitle: "أن تعيش أثر الاسم لا أن تحفظه فقط",
+    description: "رحلة مع الأسماء الحسنى تربط معانيها بحياتك ومواقفك وعبوديتك.",
+    totalNames: 99,
+    names: asmaNames,
+  },
+];
+
+export function getTrack(trackId: string): Track | undefined {
+  return wordTracks.find((track) => track.id === trackId);
+}
+
+export function getNamesTrack(trackId: string): NamesTrack | undefined {
+  const track = getTrack(trackId);
+  if (track && isNamesTrack(track)) return track;
+  return undefined;
+}
+
+export function getName(trackId: string, nameId: string): NameItem | undefined {
+  return getNamesTrack(trackId)?.names.find((n) => n.id === nameId);
+}
+
+export function getStory(
+  trackId: string,
+  storyId: number
+): StoryContent | undefined {
+  const track = getTrack(trackId);
+  if (!track || !isWordTrack(track)) return undefined;
+  return track.stories.find((story) => story.id === storyId);
+}
+
+export function getTrackCompletedStories(
+  trackId: string,
+  completedStoriesByTrack: Record<string, number[]>
+): number[] {
+  return completedStoriesByTrack[trackId] ?? [];
+}
+
+export function getTrackProgress(
+  trackId: string,
+  completedStoriesByTrack: Record<string, number[]>
+): number {
+  return getTrackCompletedStories(trackId, completedStoriesByTrack).length;
+}
+
+export function getNamesTrackProgress(
+  trackId: string,
+  completedNames: Record<string, string[]>
+): number {
+  return (completedNames[trackId] ?? []).length;
+}
+
+export function getStoryStatus(
+  trackId: string,
+  storyId: number,
+  completedStoriesByTrack: Record<string, number[]>,
+  devMode = false
+): StoryStatus {
+  const track = getTrack(trackId);
+  if (!track || !isWordTrack(track)) return "locked";
+  const story = getStory(trackId, storyId);
+
+  if (!story) return "locked";
+
+  if (!devMode && !story.contentReady) return "locked";
+
+  const completedStories = getTrackCompletedStories(trackId, completedStoriesByTrack);
+  if (completedStories.includes(storyId)) return "completed";
+  if (storyId === 1) return "available";
+  if (completedStories.includes(storyId - 1)) return "available";
+  return "locked";
+}
+
+export function getNextAvailableStory(
+  trackId: string,
+  completedStoriesByTrack: Record<string, number[]>,
+  devMode = false
+): StoryContent | undefined {
+  const track = getTrack(trackId);
+  if (!track || !isWordTrack(track)) return undefined;
+
+  return track.stories.find(
+    (story) =>
+      getStoryStatus(trackId, story.id, completedStoriesByTrack, devMode) ===
+      "available"
+  );
+}
+
+export function hasReadyStories(track: WordTrack, devMode = false): boolean {
+  return track.stories.some((story) => story.contentReady || devMode);
+}
+
+export function hasReadyNames(track: NamesTrack, devMode = false): boolean {
+  return track.names.some((name) => name.contentReady || devMode);
+}
+
+export function getCompletedTrackIds(
+  completedStoriesByTrack: Record<string, number[]>
+): string[] {
+  return wordTracks
+    .filter((track) => {
+      if (isNamesTrack(track)) return false;
+      return getTrackProgress(track.id, completedStoriesByTrack) >= track.totalStories;
+    })
+    .map((track) => track.id);
+}
+
+export function toArabicNumeral(n: number): string {
+  return n.toString().replace(/[0-9]/g, (d) => "٠١٢٣٤٥٦٧٨٩"[+d]);
+}

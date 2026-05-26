@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { getStory, getTrack, hasReadyStories, toArabicNumeral, wordTracks } from "@/data/days";
+import { getStory, getTrack, hasReadyStories, isWordTrack, toArabicNumeral, wordTracks } from "@/data/days";
 import {
   getActivePledge,
   getTodayRead,
@@ -44,7 +44,9 @@ export default function HomePage() {
   const todayRead = getTodayRead(userData);
   const hasDoneToday = !!todayRead && !devUnlimited;
 
-  const readyTracks = wordTracks.filter((track) => hasReadyStories(track, devMode));
+  const readyTracks = wordTracks.filter(
+    (track) => isWordTrack(track) && hasReadyStories(track, devMode)
+  );
   const activePledge = getActivePledge(userData);
   const activePledgeTrack = activePledge ? getTrack(activePledge.trackId) : null;
   const activePledgeStory = activePledge
@@ -52,12 +54,17 @@ export default function HomePage() {
     : null;
 
   const todayTrack = todayRead ? getTrack(todayRead.trackId) : null;
-  const todayStory = todayRead ? getStory(todayRead.trackId, todayRead.storyId) : null;
-  const todayReflection = todayRead
-    ? userData.reflections.find(
-        (r) => r.trackId === todayRead.trackId && r.storyId === todayRead.storyId
-      )
-    : null;
+  const todayStory =
+    todayRead && todayRead.itemType !== "name" && todayRead.storyId != null
+      ? getStory(todayRead.trackId, todayRead.storyId)
+      : null;
+  const todayStoryId = todayRead?.storyId ?? null;
+  const todayReflection =
+    todayRead && todayStoryId != null
+      ? userData.reflections.find(
+          (r) => r.trackId === todayRead.trackId && r.storyId === todayStoryId
+        )
+      : null;
 
   function handlePledgeOutcome(outcome: "done" | "tried" | "forgot" | "no_situation") {
     if (!activePledge) return;
@@ -193,6 +200,7 @@ export default function HomePage() {
 
             <motion.div variants={item} className="flex flex-col gap-3">
               {readyTracks.map((track) => {
+                if (!isWordTrack(track)) return null;
                 const completed = userData.completedStoriesByTrack[track.id]?.length ?? 0;
                 return (
                   <Link
