@@ -8,10 +8,8 @@ import { motion } from "framer-motion";
 
 import { getName, getNamesTrack, toArabicNumeral } from "@/data/days";
 import {
-  getTodayTrackRead,
   getUserData,
   isDevMode,
-  isDevUnlimited,
   setActiveTrack,
   UserData,
 } from "@/lib/storage";
@@ -35,13 +33,11 @@ export default function NameStoriesPage() {
 
   const [userData, setUserData] = useState<UserData | null>(null);
   const [devMode, setDevMode] = useState(false);
-  const [devUnlimited, setDevUnlimited] = useState(false);
 
   useEffect(() => {
     const data = getUserData();
     setUserData(data);
     setDevMode(isDevMode());
-    setDevUnlimited(isDevUnlimited());
     setActiveTrack(trackId);
   }, [trackId]);
 
@@ -60,8 +56,6 @@ export default function NameStoriesPage() {
 
   const completedStoryIds =
     userData.completedNameStoriesByTrack?.[trackId]?.[nameId] ?? [];
-  const todayRead = getTodayTrackRead(userData, trackId);
-  const hasDoneToday = !!todayRead && !devUnlimited;
   const progress = completedStoryIds.length;
   const total = name.stories.length;
 
@@ -123,14 +117,8 @@ export default function NameStoriesPage() {
         </div>
       </section>
 
-      {/* Daily limit banner */}
-      {hasDoneToday ? (
-        <section className="px-6 pb-8">
-          <div className="w-full text-center py-4 rounded-2xl text-[15px] font-semibold bg-kanah-surface border border-kanah-border text-kanah-muted">
-            يكفيك قصة واحدة اليوم · عُد غداً للقصة التالية
-          </div>
-        </section>
-      ) : nextStory ? (
+      {/* CTA button */}
+      {nextStory && (
         <section className="px-6 pb-8">
           <Link
             href={`/tracks/${trackId}/names/${nameId}/stories/${nextStory.id}`}
@@ -139,7 +127,7 @@ export default function NameStoriesPage() {
             {progress > 0 ? "تابع القصة المتاحة" : "ابدأ هذه الرحلة"}
           </Link>
         </section>
-      ) : null}
+      )}
 
       {/* Stories list */}
       <section className="px-6 pb-12">
@@ -161,10 +149,7 @@ export default function NameStoriesPage() {
               story.storyNumber > 1 &&
               !completedStoryIds.includes(story.id - 1) &&
               !devMode;
-            const blockedByDaily =
-              hasDoneToday && !isCompleted && !isLocked && !isComingSoon;
-            const canOpen =
-              !isComingSoon && !isLocked && !blockedByDaily;
+            const canOpen = !isComingSoon && !isLocked;
 
             const card = (
               <motion.div
@@ -188,10 +173,6 @@ export default function NameStoriesPage() {
                   ) : isComingSoon ? (
                     <span className="text-[11px] font-semibold text-kanah-locked bg-kanah-border px-2.5 py-1 rounded-full">
                       قريباً
-                    </span>
-                  ) : blockedByDaily ? (
-                    <span className="text-[11px] font-semibold text-kanah-locked bg-kanah-border px-2.5 py-1 rounded-full">
-                      غداً
                     </span>
                   ) : isLocked ? (
                     <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-kanah-locked bg-kanah-border px-2.5 py-1 rounded-full">
