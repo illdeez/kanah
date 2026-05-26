@@ -60,6 +60,7 @@ export default function NamesListPage() {
 
   const progress = getNamesTrackProgress(trackId, userData.completedNamesByTrack);
   const completedNames = userData.completedNamesByTrack[trackId] ?? [];
+  const completedNameStoriesByTrack = userData.completedNameStoriesByTrack ?? {};
   const todayRead = getTodayTrackRead(userData, trackId);
   const hasDoneToday = !!todayRead && !devUnlimited;
 
@@ -170,13 +171,20 @@ export default function NamesListPage() {
             name.name.includes(search.trim()) ||
             name.title.includes(search.trim())
           ).map((name) => {
-            const isCompleted = completedNames.includes(name.id);
+            const hasSubStories = !!name.stories && name.stories.length > 0;
+            const completedSubStories = hasSubStories
+              ? (completedNameStoriesByTrack[trackId]?.[name.id] ?? []).length
+              : 0;
+            const totalSubStories = hasSubStories ? name.stories!.length : 0;
+            const isCompleted = hasSubStories
+              ? completedSubStories >= totalSubStories
+              : completedNames.includes(name.id);
             const isComingSoon = !name.contentReady && !devMode;
             const blockedByDaily =
               hasDoneToday &&
               !isCompleted &&
               !(
-                todayRead?.itemType === "name" &&
+                (todayRead?.itemType === "name" || todayRead?.itemType === "nameStory") &&
                 todayRead.trackId === trackId &&
                 todayRead.nameId === name.id
               );
@@ -194,6 +202,10 @@ export default function NamesListPage() {
             ) : blockedByDaily ? (
               <span className="text-[10px] font-semibold text-kanah-locked bg-kanah-border px-2 py-0.5 rounded-full">
                 غداً
+              </span>
+            ) : hasSubStories ? (
+              <span className="text-[10px] font-semibold text-kanah-accent bg-kanah-accent-subtle px-2 py-0.5 rounded-full">
+                {toArabicNumeral(completedSubStories)} من {toArabicNumeral(totalSubStories)}
               </span>
             ) : (
               <span className="text-[10px] font-semibold text-kanah-accent bg-kanah-accent-subtle px-2 py-0.5 rounded-full">
@@ -235,7 +247,7 @@ export default function NamesListPage() {
             return (
               <Link
                 key={name.id}
-                href={`/tracks/${trackId}/names/${name.id}`}
+                href={hasSubStories ? `/tracks/${trackId}/names/${name.id}/stories` : `/tracks/${trackId}/names/${name.id}`}
               >
                 {card}
               </Link>

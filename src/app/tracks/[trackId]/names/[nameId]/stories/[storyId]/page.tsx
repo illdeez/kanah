@@ -6,7 +6,7 @@ import { CheckCircle2, ChevronRight, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getName, getNamesTrack, toArabicNumeral } from "@/data/days";
 import {
-  completeName,
+  completeNameStory,
   getTodayTrackRead,
   getUserData,
   isDevMode,
@@ -35,24 +35,25 @@ function Divider() {
   );
 }
 
-function Section({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+function Section({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
-      transition={{ ease, duration: 0.5, delay }}
+      transition={{ ease, duration: 0.5 }}
     >
       {children}
     </motion.div>
   );
 }
 
-export default function NamePage() {
+export default function NameStoryPage() {
   const params = useParams();
   const router = useRouter();
   const trackId = String(params.trackId);
   const nameId = String(params.nameId);
+  const storyId = Number(params.storyId);
 
   const [userData, setUserData] = useState<UserData | null>(null);
   const [devMode, setDevMode] = useState(false);
@@ -70,9 +71,10 @@ export default function NamePage() {
 
   const track = getNamesTrack(trackId);
   const name = getName(trackId, nameId);
+  const story = name?.stories?.find((s) => s.id === storyId) ?? null;
 
   const isCompleted = userData
-    ? (userData.completedNamesByTrack[trackId] ?? []).includes(nameId)
+    ? (userData.completedNameStoriesByTrack?.[trackId]?.[nameId] ?? []).includes(storyId)
     : false;
 
   const todayRead = userData ? getTodayTrackRead(userData, trackId) : null;
@@ -80,7 +82,11 @@ export default function NamePage() {
     !devUnlimited &&
     !isCompleted &&
     !!todayRead &&
-    !(todayRead.itemType === "name" && todayRead.nameId === nameId);
+    !(
+      todayRead.itemType === "nameStory" &&
+      todayRead.nameId === nameId &&
+      todayRead.storyId === storyId
+    );
 
   useEffect(() => {
     if (!userData) return;
@@ -101,26 +107,22 @@ export default function NamePage() {
   }, [userData, isCompleted]);
 
   useEffect(() => {
-    if (!track || !name) router.replace(`/tracks/${trackId}/names`);
-    if (name && name.stories && name.stories.length > 0) {
+    if (!track || !name || !story) {
       router.replace(`/tracks/${trackId}/names/${nameId}/stories`);
     }
-  }, [track, name, trackId, nameId, router]);
+  }, [track, name, story, trackId, nameId, router]);
 
-  if (!userData || !track || !name) return null;
-
-  // Redirect names with sub-stories to the stories list
-  if (name.stories && name.stories.length > 0) return null;
+  if (!userData || !track || !name || !story) return null;
 
   // Block if no content
-  if (!name.contentReady && !devMode) {
-    router.replace(`/tracks/${trackId}/names`);
+  if (!story.contentReady && !devMode) {
+    router.replace(`/tracks/${trackId}/names/${nameId}/stories`);
     return null;
   }
 
   if (blockedByDaily) {
     return (
-      <main className="flex flex-col min-h-screen">
+      <main className="flex flex-col min-h-screen" dir="rtl">
         <header className="sticky top-0 z-40 bg-kanah-bg/95 backdrop-blur-sm border-b border-kanah-border">
           <div className="flex items-center gap-3 px-4 h-14">
             <button
@@ -147,10 +149,10 @@ export default function NamePage() {
             transition={{ ease, duration: 0.45, delay: 0.2 }}
           >
             <p className="text-[22px] font-bold text-kanah-text mb-3">
-              يكفيك معنى واحد اليوم
+              يكفيك قصة واحدة اليوم
             </p>
             <p className="text-[16px] text-kanah-muted leading-[2]">
-              عُد غداً لتعيش اسماً جديداً.
+              عُد غداً للقصة التالية.
             </p>
           </motion.div>
         </div>
@@ -160,12 +162,12 @@ export default function NamePage() {
 
   function handleComplete() {
     setCompleting(true);
-    completeName(trackId, nameId);
-    router.push(`/tracks/${trackId}/names/${nameId}/complete`);
+    completeNameStory(trackId, nameId, storyId);
+    router.push(`/tracks/${trackId}/names/${nameId}/stories`);
   }
 
   return (
-    <main className="flex flex-col min-h-screen">
+    <main className="flex flex-col min-h-screen" dir="rtl">
       <header className="sticky top-0 z-40 bg-kanah-bg/95 backdrop-blur-sm border-b border-kanah-border">
         <div className="flex items-center gap-3 px-4 h-14">
           <button
@@ -177,15 +179,15 @@ export default function NamePage() {
           </button>
           <div className="flex-1 min-w-0">
             <p className="text-[10px] text-kanah-locked tracking-widest uppercase">
-              اسم من أسماء الله · {name.name}
+              {name.name} · اليوم {toArabicNumeral(story.storyNumber)}
             </p>
             <p className="text-[13px] font-semibold text-kanah-text truncate leading-tight">
-              {name.title}
+              {story.title}
             </p>
           </div>
           <div className="flex items-center gap-1 text-kanah-locked text-[11px] flex-shrink-0">
             <Clock size={11} />
-            <span>{name.readingTime}</span>
+            <span>{story.readingTime}</span>
           </div>
         </div>
       </header>
@@ -198,10 +200,11 @@ export default function NamePage() {
           className="pt-12 pb-10"
         >
           <p className="text-[10px] text-kanah-locked tracking-widest uppercase mb-5">
-            الاسم {toArabicNumeral(name.number)} من {toArabicNumeral(track.totalNames)}
+            {name.name} · اليوم {toArabicNumeral(story.storyNumber)} من{" "}
+            {toArabicNumeral(name.stories!.length)}
           </p>
-          <h1 className="text-[52px] font-extrabold text-kanah-accent leading-tight mb-4 tracking-tight">
-            {name.name}
+          <h1 className="text-[36px] font-extrabold text-kanah-accent leading-tight mb-4 tracking-tight">
+            {story.title}
           </h1>
           <p className="text-[19px] text-kanah-muted font-light leading-relaxed">
             {name.title}
@@ -223,7 +226,7 @@ export default function NamePage() {
           <section className="mb-12">
             <SectionLabel>القصة</SectionLabel>
             <p className="text-[17px] leading-[2.1] text-kanah-text whitespace-pre-line">
-              {name.story}
+              {story.story}
             </p>
           </section>
         </Section>
@@ -234,7 +237,7 @@ export default function NamePage() {
           <section className="mb-12">
             <SectionLabel>المعنى الخفي</SectionLabel>
             <p className="text-[17px] leading-[2.1] text-kanah-text whitespace-pre-line">
-              {name.hiddenMeaning}
+              {story.hiddenMeaning}
             </p>
           </section>
         </Section>
@@ -245,7 +248,7 @@ export default function NamePage() {
           <section className="mb-12">
             <SectionLabel>أثره في حياتك</SectionLabel>
             <p className="text-[17px] leading-[2.1] text-kanah-text whitespace-pre-line">
-              {name.lifeImpact}
+              {story.lifeImpact}
             </p>
           </section>
         </Section>
@@ -257,7 +260,7 @@ export default function NamePage() {
             <div className="bg-kanah-surface rounded-2xl p-6 border border-kanah-border">
               <SectionLabel>سؤال محاسبة</SectionLabel>
               <p className="text-[18px] leading-[2] text-kanah-text font-medium">
-                {name.reflectionQuestion}
+                {story.reflectionQuestion}
               </p>
             </div>
           </section>
@@ -268,7 +271,7 @@ export default function NamePage() {
             <div className="bg-kanah-accent-subtle rounded-2xl p-6">
               <SectionLabel>عمل اليوم</SectionLabel>
               <p className="text-[17px] leading-[2.1] text-kanah-text whitespace-pre-line">
-                {name.dailyAction}
+                {story.dailyAction}
               </p>
             </div>
           </section>
@@ -283,7 +286,7 @@ export default function NamePage() {
             className="flex items-center justify-center gap-2 py-3 text-kanah-completed font-medium text-[15px]"
           >
             <CheckCircle2 size={18} />
-            <span>أتممت هذا الاسم بالفعل</span>
+            <span>أتممت هذه القصة بالفعل</span>
           </motion.div>
         ) : (
           <AnimatePresence mode="wait">

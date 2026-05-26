@@ -24,7 +24,7 @@ export interface Pledge {
 
 export interface DailyRead {
   trackId: string;
-  itemType: "story" | "name";
+  itemType: "story" | "name" | "nameStory";
   storyId?: number;
   nameId?: string;
   completedAt: string;
@@ -33,6 +33,7 @@ export interface DailyRead {
 export interface UserData {
   completedStoriesByTrack: Record<string, number[]>;
   completedNamesByTrack: Record<string, string[]>;
+  completedNameStoriesByTrack: Record<string, Record<string, number[]>>;
   reflections: Reflection[];
   pledges: Pledge[];
   activeTrackId: string | null;
@@ -46,6 +47,7 @@ const LEGACY_PRIMARY_TRACK = "kazm-al-ghayz";
 const defaults: UserData = {
   completedStoriesByTrack: {},
   completedNamesByTrack: {},
+  completedNameStoriesByTrack: {},
   reflections: [],
   pledges: [],
   activeTrackId: LEGACY_PRIMARY_TRACK,
@@ -86,6 +88,12 @@ function migrateLegacyData(raw: unknown): UserData {
     source.completedNamesByTrack &&
     typeof source.completedNamesByTrack === "object"
       ? (source.completedNamesByTrack as Record<string, string[]>)
+      : {};
+
+  const completedNameStoriesByTrack: Record<string, Record<string, number[]>> =
+    source.completedNameStoriesByTrack &&
+    typeof source.completedNameStoriesByTrack === "object"
+      ? (source.completedNameStoriesByTrack as Record<string, Record<string, number[]>>)
       : {};
 
   const reflections: Reflection[] = Array.isArray(source.reflections)
@@ -184,10 +192,13 @@ function migrateLegacyData(raw: unknown): UserData {
       const e = dateEntry as Record<string, unknown>;
       if (typeof e.trackId === "string" && typeof e.completedAt === "string") {
         // Old format — migrate to new
-        const itemType: "story" | "name" = e.itemType === "name" ? "name" : "story";
+        const itemType: "story" | "name" | "nameStory" =
+          e.itemType === "name" ? "name" : e.itemType === "nameStory" ? "nameStory" : "story";
         const read: DailyRead =
           itemType === "name"
             ? { trackId: e.trackId, itemType: "name", nameId: typeof e.nameId === "string" ? e.nameId : undefined, completedAt: e.completedAt }
+            : itemType === "nameStory"
+            ? { trackId: e.trackId, itemType: "nameStory", nameId: typeof e.nameId === "string" ? e.nameId : undefined, storyId: typeof e.storyId === "number" ? e.storyId : undefined, completedAt: e.completedAt }
             : { trackId: e.trackId, itemType: "story", storyId: typeof e.storyId === "number" ? e.storyId : undefined, completedAt: e.completedAt };
         dailyReads[date] = { [e.trackId]: read };
       } else {
@@ -197,10 +208,13 @@ function migrateLegacyData(raw: unknown): UserData {
           if (!trackEntry || typeof trackEntry !== "object") continue;
           const te = trackEntry as Record<string, unknown>;
           if (typeof te.completedAt !== "string") continue;
-          const itemType: "story" | "name" = te.itemType === "name" ? "name" : "story";
+          const itemType: "story" | "name" | "nameStory" =
+            te.itemType === "name" ? "name" : te.itemType === "nameStory" ? "nameStory" : "story";
           trackMap[trackId] =
             itemType === "name"
               ? { trackId, itemType: "name", nameId: typeof te.nameId === "string" ? te.nameId : undefined, completedAt: te.completedAt }
+              : itemType === "nameStory"
+              ? { trackId, itemType: "nameStory", nameId: typeof te.nameId === "string" ? te.nameId : undefined, storyId: typeof te.storyId === "number" ? te.storyId : undefined, completedAt: te.completedAt }
               : { trackId, itemType: "story", storyId: typeof te.storyId === "number" ? te.storyId : undefined, completedAt: te.completedAt };
         }
         if (Object.keys(trackMap).length > 0) dailyReads[date] = trackMap;
@@ -220,6 +234,7 @@ function migrateLegacyData(raw: unknown): UserData {
       ])
     ),
     completedNamesByTrack,
+    completedNameStoriesByTrack,
     reflections,
     pledges,
     activeTrackId:
@@ -314,6 +329,37 @@ export function completeName(trackId: string, nameId: string): void {
     };
   }
   saveUserData(data);
+}
+
+export function completeNameStory(trackId: string, nameId: string, storyId: number): void {
+  const data = getUserData();
+  if (!data.completedNameStoriesByTrack[trackId]) {
+    data.completedNameStoriesByTrack[trackId] = {};
+  }
+  const current = data.completedNameStoriesByTrack[trackId][nameId] ?? [];
+  if (!current.includes(storyId)) {
+    data.completedNameStoriesByTrack[trackId][nameId] = uniqueSorted([...current, storyId]);
+  }
+  data.activeTrackId = trackId;
+  const today = getTodayString();
+  if (!data.dailyReads[today]) data.dailyReads[today] = {};
+  if (!data.dailyReads[today][trackId]) {
+    data.dailyReads[today][trackId] = {
+      trackId,
+      itemType: "nameStory",
+      nameId,
+      storyId,
+      completedAt: new Date().toISOString(),
+    };
+  }
+  saveUserData(data);
+}
+
+export function getTodayNameStoryRead(data: UserData, trackId: string, nameId: string): DailyRead | null {
+  const read = data.dailyReads?.[getTodayString()]?.[trackId] ?? null;
+  if (!read) return null;
+  if (read.itemType === "nameStory" && read.nameId === nameId) return read;
+  return null;
 }
 
 export function saveReflection(
