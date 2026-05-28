@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 
 import { getName, getNamesTrack, toArabicNumeral } from "@/data/days";
 import {
-  getTodayTrackRead,
+  getTodayNameRead,
   getUserData,
   isDevMode,
   isDevUnlimited,
@@ -59,7 +59,7 @@ export default function NameStoriesPage() {
 
   const completedStoryIds =
     userData.completedNameStoriesByTrack?.[trackId]?.[nameId] ?? [];
-  const todayTrackRead = getTodayTrackRead(userData, trackId);
+  const todayTrackRead = getTodayNameRead(userData, trackId, nameId);
   const hasDoneToday = !!todayTrackRead && !devUnlimited;
   const progress = completedStoryIds.length;
   const total = name.stories.length;
@@ -141,8 +141,11 @@ export default function NameStoriesPage() {
       ) : hasDoneToday ? (
         <section className="px-6 pb-8">
           <div className="w-full text-center py-4 rounded-2xl text-[15px] font-semibold bg-kanah-surface border border-kanah-border text-kanah-muted">
-            أتممت قصة اليوم في هذا المسار. القصة التالية تُفتح غداً.
+            أتممت قصة اليوم مع هذا الاسم. القصة التالية تُفتح غداً.
           </div>
+          <p className="text-[13px] text-kanah-accent text-center mt-3">
+            يمكنك اختيار اسم آخر اليوم.
+          </p>
         </section>
       ) : nextStory ? (
         <section className="px-6 pb-8">
@@ -150,7 +153,7 @@ export default function NameStoriesPage() {
             onClick={handleOpenTodayStory}
             className="block w-full text-center py-4 rounded-2xl text-[16px] font-semibold bg-kanah-accent text-white shadow-accent active:scale-[0.98]"
           >
-            {progress > 0 ? "اقرأ قصة اليوم من هذا المسار" : "ابدأ قصة اليوم"}
+            {progress > 0 ? "اقرأ قصة اليوم" : "ابدأ قصة اليوم"}
           </button>
         </section>
       ) : null}

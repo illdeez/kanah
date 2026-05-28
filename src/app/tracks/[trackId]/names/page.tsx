@@ -102,8 +102,11 @@ export default function NamesListPage() {
         <p className="text-[14px] text-kanah-muted leading-[2] mb-6">
           {track.description}
         </p>
-        <p className="text-[14px] font-semibold text-kanah-text leading-[1.9] mb-6">
-          اختر اسماً لتبدأ رحلتك
+        <p className="text-[14px] font-semibold text-kanah-text leading-[1.9] mb-2">
+          اختر اسماً تعيش معه اليوم.
+        </p>
+        <p className="text-[13px] text-kanah-muted leading-[1.9] mb-6">
+          يمكنك قراءة أكثر من اسم اليوم، لكن قصة واحدة فقط من كل اسم.
         </p>
 
         <div className="bg-kanah-card border border-kanah-border rounded-2xl p-5">

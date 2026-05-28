@@ -59,6 +59,10 @@ function getDefaultActiveTrackId(): string | null {
   return wordTracks[0]?.id ?? null;
 }
 
+function getDailyReadKey(trackId: string, nameId?: string): string {
+  return nameId ? `${trackId}:${nameId}` : trackId;
+}
+
 function uniqueSorted(values: number[]): number[] {
   return Array.from(new Set(values)).sort((a, b) => a - b);
 }
@@ -200,22 +204,41 @@ function migrateLegacyData(raw: unknown): UserData {
             : itemType === "nameStory"
             ? { trackId: e.trackId, itemType: "nameStory", nameId: typeof e.nameId === "string" ? e.nameId : undefined, storyId: typeof e.storyId === "number" ? e.storyId : undefined, completedAt: e.completedAt }
             : { trackId: e.trackId, itemType: "story", storyId: typeof e.storyId === "number" ? e.storyId : undefined, completedAt: e.completedAt };
-        dailyReads[date] = { [e.trackId]: read };
+        const key =
+          itemType === "story"
+            ? getDailyReadKey(e.trackId)
+            : getDailyReadKey(
+                e.trackId,
+                typeof e.nameId === "string" ? e.nameId : undefined
+              );
+        dailyReads[date] = { [key]: read };
       } else {
         // New format — parse per-track entries
         const trackMap: Record<string, DailyRead> = {};
-        for (const [trackId, trackEntry] of Object.entries(e)) {
+        for (const [readKey, trackEntry] of Object.entries(e)) {
           if (!trackEntry || typeof trackEntry !== "object") continue;
           const te = trackEntry as Record<string, unknown>;
           if (typeof te.completedAt !== "string") continue;
           const itemType: "story" | "name" | "nameStory" =
             te.itemType === "name" ? "name" : te.itemType === "nameStory" ? "nameStory" : "story";
-          trackMap[trackId] =
+          const storedTrackId =
+            typeof te.trackId === "string"
+              ? te.trackId
+              : typeof te.nameId === "string" && readKey.includes(":")
+              ? readKey.split(":")[0]
+              : readKey;
+          const storedNameId =
+            typeof te.nameId === "string" ? te.nameId : undefined;
+          const normalizedKey =
+            itemType === "story"
+              ? getDailyReadKey(storedTrackId)
+              : getDailyReadKey(storedTrackId, storedNameId);
+          trackMap[normalizedKey] =
             itemType === "name"
-              ? { trackId, itemType: "name", nameId: typeof te.nameId === "string" ? te.nameId : undefined, completedAt: te.completedAt }
+              ? { trackId: storedTrackId, itemType: "name", nameId: storedNameId, completedAt: te.completedAt }
               : itemType === "nameStory"
-              ? { trackId, itemType: "nameStory", nameId: typeof te.nameId === "string" ? te.nameId : undefined, storyId: typeof te.storyId === "number" ? te.storyId : undefined, completedAt: te.completedAt }
-              : { trackId, itemType: "story", storyId: typeof te.storyId === "number" ? te.storyId : undefined, completedAt: te.completedAt };
+              ? { trackId: storedTrackId, itemType: "nameStory", nameId: storedNameId, storyId: typeof te.storyId === "number" ? te.storyId : undefined, completedAt: te.completedAt }
+              : { trackId: storedTrackId, itemType: "story", storyId: typeof te.storyId === "number" ? te.storyId : undefined, completedAt: te.completedAt };
         }
         if (Object.keys(trackMap).length > 0) dailyReads[date] = trackMap;
       }
@@ -275,7 +298,16 @@ export function getTodayString(): string {
 
 /** Returns the read for a specific track today, or null. */
 export function getTodayTrackRead(data: UserData, trackId: string): DailyRead | null {
-  return data.dailyReads?.[getTodayString()]?.[trackId] ?? null;
+  return data.dailyReads?.[getTodayString()]?.[getDailyReadKey(trackId)] ?? null;
+}
+
+/** Returns the read for a specific name inside a names track today, or null. */
+export function getTodayNameRead(
+  data: UserData,
+  trackId: string,
+  nameId: string
+): DailyRead | null {
+  return data.dailyReads?.[getTodayString()]?.[getDailyReadKey(trackId, nameId)] ?? null;
 }
 
 /** Returns any read from today (for display purposes on home/trace pages). */
@@ -300,8 +332,9 @@ export function completeStory(trackId: string, storyId: number): void {
   data.activeTrackId = trackId;
   const today = getTodayString();
   if (!data.dailyReads[today]) data.dailyReads[today] = {};
-  if (!data.dailyReads[today][trackId]) {
-    data.dailyReads[today][trackId] = {
+  const readKey = getDailyReadKey(trackId);
+  if (!data.dailyReads[today][readKey]) {
+    data.dailyReads[today][readKey] = {
       trackId,
       itemType: "story",
       storyId,
@@ -320,8 +353,9 @@ export function completeName(trackId: string, nameId: string): void {
   data.activeTrackId = trackId;
   const today = getTodayString();
   if (!data.dailyReads[today]) data.dailyReads[today] = {};
-  if (!data.dailyReads[today][trackId]) {
-    data.dailyReads[today][trackId] = {
+  const readKey = getDailyReadKey(trackId, nameId);
+  if (!data.dailyReads[today][readKey]) {
+    data.dailyReads[today][readKey] = {
       trackId,
       itemType: "name",
       nameId,
@@ -343,8 +377,9 @@ export function completeNameStory(trackId: string, nameId: string, storyId: numb
   data.activeTrackId = trackId;
   const today = getTodayString();
   if (!data.dailyReads[today]) data.dailyReads[today] = {};
-  if (!data.dailyReads[today][trackId]) {
-    data.dailyReads[today][trackId] = {
+  const readKey = getDailyReadKey(trackId, nameId);
+  if (!data.dailyReads[today][readKey]) {
+    data.dailyReads[today][readKey] = {
       trackId,
       itemType: "nameStory",
       nameId,
@@ -356,7 +391,7 @@ export function completeNameStory(trackId: string, nameId: string, storyId: numb
 }
 
 export function getTodayNameStoryRead(data: UserData, trackId: string, nameId: string): DailyRead | null {
-  const read = data.dailyReads?.[getTodayString()]?.[trackId] ?? null;
+  const read = getTodayNameRead(data, trackId, nameId);
   if (!read) return null;
   if (read.itemType === "nameStory" && read.nameId === nameId) return read;
   return null;

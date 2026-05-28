@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getName, getNamesTrack, toArabicNumeral } from "@/data/days";
 import {
   completeName,
-  getTodayRead,
+  getTodayNameRead,
   getUserData,
   isDevMode,
   UserData,
@@ -69,17 +69,11 @@ export default function NamePage() {
   const isCompleted = userData
     ? (userData.completedNamesByTrack[trackId] ?? []).includes(nameId)
     : false;
-  const todayRead = userData ? getTodayRead(userData) : null;
-  const todayTrackRead =
-    todayRead &&
-    todayRead.itemType === "name" &&
-    todayRead.trackId === trackId
-      ? todayRead
-      : null;
+  const todayTrackRead = userData ? getTodayNameRead(userData, trackId, nameId) : null;
   const blockedByDaily =
     !isCompleted &&
     !!todayTrackRead &&
-    !(todayTrackRead.nameId === nameId);
+    !(todayTrackRead.itemType === "name" && todayTrackRead.nameId === nameId);
 
   useEffect(() => {
     if (!userData) return;
@@ -135,10 +129,13 @@ export default function NamePage() {
           <span className="text-[48px] text-kanah-accent-muted block">✦</span>
           <div>
             <p className="text-[22px] font-bold text-kanah-text mb-3">
-              خذ وقتك مع معنى اليوم
+              خذ وقتك مع معنى هذا الاسم
             </p>
             <p className="text-[16px] text-kanah-muted leading-[2]">
-              خذ وقتك مع معنى اليوم… القراءة التالية في هذا المسار تُفتح غداً.
+              خذ وقتك مع معنى هذا الاسم… القراءة التالية تُفتح غداً.
+            </p>
+            <p className="text-[14px] text-kanah-accent leading-[1.9] mt-3">
+              يمكنك اختيار اسم آخر اليوم.
             </p>
           </div>
         </div>

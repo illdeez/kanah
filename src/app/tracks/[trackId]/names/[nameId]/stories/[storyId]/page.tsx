@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getName, getNamesTrack, toArabicNumeral } from "@/data/days";
 import {
   completeNameStory,
-  getTodayTrackRead,
+  getTodayNameRead,
   getUserData,
   isDevMode,
   isDevUnlimited,
@@ -93,7 +93,7 @@ export default function NameStoryPage() {
     return () => obs.disconnect();
   }, [userData, isCompleted]);
 
-  const todayTrackRead = userData ? getTodayTrackRead(userData, trackId) : null;
+  const todayTrackRead = userData ? getTodayNameRead(userData, trackId, nameId) : null;
   const blockedByDaily =
     !devUnlimited &&
     !isCompleted &&
@@ -147,10 +147,13 @@ export default function NameStoryPage() {
             transition={{ ease, duration: 0.45, delay: 0.2 }}
           >
             <p className="text-[22px] font-bold text-kanah-text mb-3">
-              خذ وقتك مع معنى اليوم
+              خذ وقتك مع معنى هذا الاسم
             </p>
             <p className="text-[16px] text-kanah-muted leading-[2]">
-              خذ وقتك مع معنى اليوم… القصة التالية في هذا المسار تُفتح غداً.
+              خذ وقتك مع معنى هذا الاسم… القصة التالية تُفتح غداً.
+            </p>
+            <p className="text-[14px] text-kanah-accent leading-[1.9] mt-3">
+              يمكنك اختيار اسم آخر اليوم.
             </p>
           </motion.div>
         </div>
