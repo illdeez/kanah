@@ -45,21 +45,27 @@ export default function LibraryPage() {
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ ease, duration: 0.45 }}
-        className="px-6 pt-12 pb-8"
+        className="px-6 pt-12 pb-6"
       >
-        <p className="text-[11px] font-semibold text-kanah-accent-muted tracking-widest uppercase mb-1">
-          مكتبة الكلمات
-        </p>
-        <h1 className="text-[22px] font-bold text-kanah-text leading-tight">
-          كل كلمة هنا مسار من قصص ومعانٍ وأعمال يومية
-        </h1>
+        <div className="flex items-end justify-between">
+          <div>
+            <p className="text-[11px] font-semibold tracking-[0.3em] text-kanah-accent-muted mb-1.5">
+              مكتبة الكلمات
+            </p>
+            <h1 className="text-[28px] font-extrabold text-kanah-text leading-none">
+              استكشف
+            </h1>
+          </div>
+          <p className="text-[11px] text-kanah-locked pb-0.5">كل كلمة مسار كامل</p>
+        </div>
+        <div className="mt-5 h-px bg-kanah-border" />
       </motion.header>
 
       <motion.div
         variants={container}
         initial="hidden"
         animate="show"
-        className="px-4 flex flex-col gap-4"
+        className="px-6 flex flex-col gap-4"
       >
         {wordTracks.map((track) => {
           const isActive = userData.activeTrackId === track.id;
@@ -91,7 +97,7 @@ export default function LibraryPage() {
                           آخر مسار قرأته
                         </span>
                       ) : progress > 0 ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-kanah-completed bg-emerald-50 px-2.5 py-1 rounded-full">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-kanah-completed bg-kanah-completed/10 px-2.5 py-1 rounded-full">
                           <CheckCircle2 size={11} />
                           بدأت هذا المسار
                         </span>
@@ -179,7 +185,7 @@ export default function LibraryPage() {
                         آخر مسار قرأته
                       </span>
                   ) : progress > 0 ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-kanah-completed bg-emerald-50 px-2.5 py-1 rounded-full">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-kanah-completed bg-kanah-completed/10 px-2.5 py-1 rounded-full">
                         <CheckCircle2 size={11} />
                         بدأت هذا المسار
                       </span>

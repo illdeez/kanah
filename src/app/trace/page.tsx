@@ -121,14 +121,20 @@ export default function TracePage() {
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ ease, duration: 0.45 }}
-        className="px-6 pt-12 pb-8"
+        className="px-6 pt-12 pb-6"
       >
-        <p className="text-[11px] font-semibold text-kanah-accent-muted tracking-widest uppercase mb-1">
-          أثري
-        </p>
-        <h1 className="text-[22px] font-bold text-kanah-text leading-tight">
-          الجمل التي بقيت فيك وما أخذته معك من المسارات
-        </h1>
+        <div className="flex items-end justify-between">
+          <div>
+            <p className="text-[11px] font-semibold tracking-[0.3em] text-kanah-accent-muted mb-1.5">
+              أثري
+            </p>
+            <h1 className="text-[28px] font-extrabold text-kanah-text leading-none">
+              أثرك
+            </h1>
+          </div>
+          <p className="text-[11px] text-kanah-locked pb-0.5">معانٍ تحوّلت إلى فعل</p>
+        </div>
+        <div className="mt-5 h-px bg-kanah-border" />
       </motion.header>
 
       {todayRead && todayTrack && todayStory && (
@@ -150,7 +156,7 @@ export default function TracePage() {
         className="px-6 grid grid-cols-2 gap-4 mb-10"
       >
         <motion.div variants={gridCard} className="bg-kanah-card rounded-2xl p-5 border border-kanah-border">
-          <span className="text-[38px] font-extrabold text-kanah-accent leading-none block">
+          <span className="text-[42px] font-extrabold text-kanah-accent leading-none block tabular-nums">
             {toArabicNumeral(totalCompleted)}
           </span>
           <span className="text-[12px] text-kanah-muted mt-2 block leading-snug">
@@ -161,7 +167,7 @@ export default function TracePage() {
           </p>
         </motion.div>
         <motion.div variants={gridCard} className="bg-kanah-card rounded-2xl p-5 border border-kanah-border">
-          <span className="text-[38px] font-extrabold text-kanah-accent leading-none block">
+          <span className="text-[42px] font-extrabold text-kanah-accent leading-none block tabular-nums">
             {toArabicNumeral(totalDays)}
           </span>
           <span className="text-[12px] text-kanah-muted mt-2 block leading-snug">
@@ -169,7 +175,7 @@ export default function TracePage() {
           </span>
         </motion.div>
         <motion.div variants={gridCard} className="bg-kanah-card rounded-2xl p-5 border border-kanah-border">
-          <span className="text-[38px] font-extrabold text-kanah-accent leading-none block">
+          <span className="text-[42px] font-extrabold text-kanah-accent leading-none block tabular-nums">
             {toArabicNumeral(totalCommitments)}
           </span>
           <span className="text-[12px] text-kanah-muted mt-2 block leading-snug">
@@ -180,7 +186,7 @@ export default function TracePage() {
           </p>
         </motion.div>
         <motion.div variants={gridCard} className="bg-kanah-card rounded-2xl p-5 border border-kanah-border">
-          <span className="text-[38px] font-extrabold text-kanah-accent leading-none block">
+          <span className="text-[42px] font-extrabold text-kanah-accent leading-none block tabular-nums">
             {toArabicNumeral(doneCount)}
           </span>
           <span className="text-[12px] text-kanah-muted mt-2 block leading-snug">

@@ -110,11 +110,17 @@ export default function NamesListPage() {
         </p>
 
         <div className="bg-kanah-card border border-kanah-border rounded-2xl p-5">
-          <div className="flex items-center justify-between">
-            <span className="text-[12px] text-kanah-locked">التقدّم</span>
-            <span className="text-[14px] font-semibold text-kanah-accent">
-              {toArabicNumeral(progress)} من {toArabicNumeral(track.totalNames)}
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] font-semibold text-kanah-accent-muted tracking-[0.15em] uppercase">التقدّم</span>
+            <span className="text-[14px] font-bold text-kanah-accent tabular-nums">
+              {toArabicNumeral(progress)} / {toArabicNumeral(track.totalNames)}
             </span>
+          </div>
+          <div className="h-1.5 bg-kanah-border rounded-full overflow-hidden">
+            <div
+              className="h-full bg-kanah-accent rounded-full transition-all duration-700"
+              style={{ width: `${track.totalNames > 0 ? (progress / track.totalNames) * 100 : 0}%` }}
+            />
           </div>
         </div>
       </section>
@@ -178,7 +184,7 @@ export default function NamesListPage() {
               : `ابدأ مع اسم ${name.name}`;
 
             const badge = isCompleted ? (
-              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-kanah-completed bg-emerald-50 px-2 py-0.5 rounded-full">
+              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-kanah-completed bg-kanah-completed/10 px-2 py-0.5 rounded-full">
                 <CheckCircle2 size={9} />
                 مكتمل
               </span>

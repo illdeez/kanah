@@ -200,7 +200,7 @@ export default function NameStoriesPage() {
                     اليوم {toArabicNumeral(story.storyNumber)}
                   </span>
                   {isCompleted ? (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-kanah-completed bg-emerald-50 px-2.5 py-1 rounded-full">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-kanah-completed bg-kanah-completed/10 px-2.5 py-1 rounded-full">
                       <CheckCircle2 size={11} />
                       مكتملة
                     </span>
