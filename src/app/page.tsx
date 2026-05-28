@@ -3,10 +3,19 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { getStory, getTrack, hasReadyStories, isWordTrack, toArabicNumeral, wordTracks } from "@/data/days";
+import {
+  getNextAvailableStory,
+  getStory,
+  getTrack,
+  hasReadyStories,
+  isWordTrack,
+  toArabicNumeral,
+  wordTracks,
+} from "@/data/days";
 import {
   getActivePledge,
   getTodayRead,
+  getTodayTrackRead,
   getUserData,
   initUser,
   isDevMode,
@@ -42,11 +51,15 @@ export default function HomePage() {
   if (!userData) return null;
 
   const todayRead = getTodayRead(userData);
-  const hasDoneToday = !!todayRead && !devUnlimited;
-
-  const readyTracks = wordTracks.filter(
-    (track) => isWordTrack(track) && hasReadyStories(track, devMode)
-  );
+  const wordOnlyTracks = wordTracks.filter((track) => isWordTrack(track));
+  const readyTracks = wordOnlyTracks.filter((track) => hasReadyStories(track, devMode));
+  const rawActiveTrack = userData.activeTrackId
+    ? getTrack(userData.activeTrackId)
+    : null;
+  const activeTrack =
+    rawActiveTrack && isWordTrack(rawActiveTrack)
+      ? rawActiveTrack
+      : readyTracks[0] ?? wordOnlyTracks[0] ?? null;
   const activePledge = getActivePledge(userData);
   const activePledgeTrack = activePledge ? getTrack(activePledge.trackId) : null;
   const activePledgeStory = activePledge
@@ -63,6 +76,23 @@ export default function HomePage() {
     todayRead && todayStoryId != null
       ? userData.reflections.find(
           (r) => r.trackId === todayRead.trackId && r.storyId === todayStoryId
+        )
+      : null;
+  const activeTrackTodayRead =
+    activeTrack ? getTodayTrackRead(userData, activeTrack.id) : null;
+  const activeTrackHasDoneToday = !!activeTrackTodayRead && !devUnlimited;
+  const activeTrackTodayStory =
+    activeTrackTodayRead &&
+    activeTrackTodayRead.itemType !== "name" &&
+    activeTrackTodayRead.storyId != null
+      ? getStory(activeTrackTodayRead.trackId, activeTrackTodayRead.storyId)
+      : null;
+  const activeTrackNextStory =
+    activeTrack && isWordTrack(activeTrack)
+      ? getNextAvailableStory(
+          activeTrack.id,
+          userData.completedStoriesByTrack,
+          devMode
         )
       : null;
 
@@ -83,11 +113,11 @@ export default function HomePage() {
         <span className="text-[12px] font-bold tracking-[0.25em] text-kanah-accent-muted">
           كَنْه
         </span>
-        <span className="text-[11px] text-kanah-locked">مكتبة كلمات حيّة</span>
+        <span className="text-[11px] text-kanah-locked">معانٍ تعيش معك</span>
       </motion.header>
 
       {/* ── DONE TODAY ── */}
-      {hasDoneToday && todayTrack && todayStory ? (
+      {activeTrackHasDoneToday && activeTrack && activeTrackTodayRead && activeTrackTodayStory ? (
         <section className="px-6 pt-4">
           <motion.div
             variants={container}
@@ -99,19 +129,25 @@ export default function HomePage() {
               variants={item}
               className="text-[11px] font-semibold text-kanah-completed tracking-widest uppercase mb-3"
             >
-              ✓ معنى اليوم اكتمل
+              ✓ قصة اليوم اكتملت
             </motion.p>
             <motion.h1
               variants={item}
               className="text-[26px] font-extrabold text-kanah-text leading-[1.5] mb-1"
             >
-              {todayTrack.word}
+              أتممت قصة اليوم من {activeTrack.word}
             </motion.h1>
             <motion.p
               variants={item}
               className="text-[16px] font-semibold text-kanah-accent mb-4"
             >
-              {todayStory.title}
+              {activeTrackTodayStory.title}
+            </motion.p>
+            <motion.p
+              variants={item}
+              className="text-[14px] text-kanah-muted leading-[1.9] mb-5"
+            >
+              أتممت قصة اليوم في هذا المسار. القصة التالية تُفتح غداً.
             </motion.p>
 
             {todayReflection && (
@@ -166,7 +202,7 @@ export default function HomePage() {
             )}
 
             <motion.p variants={item} className="text-[13px] text-kanah-locked mt-5 text-center">
-              عُد غداً لتعيش معنى جديداً
+              يمكنك عيش أكثر من معنى اليوم، لكن كل مسار يفتح لك قصة واحدة يومياً.
             </motion.p>
           </motion.div>
         </section>
@@ -189,36 +225,60 @@ export default function HomePage() {
               variants={item}
               className="text-[28px] font-extrabold text-kanah-text leading-[1.5] mb-2"
             >
-              اختر معنى اليوم
+              {activeTrack ? `تابع رحلتك مع ${activeTrack.word}` : "اختر مساراً تبدأ معه"}
             </motion.h1>
             <motion.p
               variants={item}
               className="text-[15px] text-kanah-muted leading-[2] mb-6"
             >
-              قصة واحدة تكفي. اختر الكلمة التي تريد أن تعيشها اليوم.
+              {activeTrack
+                ? "يمكنك عيش أكثر من معنى اليوم، لكن كل مسار يفتح لك قصة واحدة يومياً."
+                : "اختر المسار الذي تريد أن تعيش معه اليوم."}
             </motion.p>
 
-            <motion.div variants={item} className="flex flex-col gap-3">
-              {readyTracks.map((track) => {
-                if (!isWordTrack(track)) return null;
-                const completed = userData.completedStoriesByTrack[track.id]?.length ?? 0;
-                return (
-                  <Link
-                    key={track.id}
-                    href={`/tracks/${track.id}`}
-                    className="flex items-center justify-between rounded-2xl border border-kanah-border bg-kanah-surface px-5 py-4 active:scale-[0.98]"
-                  >
-                    <div>
-                      <p className="text-[18px] font-bold text-kanah-accent">{track.word}</p>
-                      <p className="text-[12px] text-kanah-muted">{track.subtitle}</p>
-                    </div>
-                    <span className="text-[11px] text-kanah-locked">
-                      {toArabicNumeral(completed)}/{toArabicNumeral(track.totalStories)}
-                    </span>
-                  </Link>
-                );
-              })}
-            </motion.div>
+            {activeTrack && activeTrackNextStory ? (
+              <motion.div variants={item} className="flex flex-col gap-3">
+                <div className="rounded-2xl border border-kanah-border bg-kanah-surface px-5 py-4">
+                  <p className="text-[12px] text-kanah-locked mb-1">
+                    القصة {toArabicNumeral(activeTrackNextStory.storyNumber)} من{" "}
+                    {toArabicNumeral(activeTrack.totalStories)}
+                  </p>
+                  <p className="text-[20px] font-bold text-kanah-accent mb-1">
+                    {activeTrackNextStory.title}
+                  </p>
+                  <p className="text-[13px] text-kanah-muted">
+                    {activeTrack.subtitle}
+                  </p>
+                </div>
+                <Link
+                  href={`/tracks/${activeTrack.id}/stories/${activeTrackNextStory.id}`}
+                  className="block w-full text-center py-4 rounded-2xl text-[16px] font-semibold bg-kanah-accent text-white shadow-accent active:scale-[0.98]"
+                >
+                  تابع قصة اليوم
+                </Link>
+              </motion.div>
+            ) : (
+              <motion.div variants={item} className="flex flex-col gap-3">
+                {readyTracks.map((track) => {
+                  const completed = userData.completedStoriesByTrack[track.id]?.length ?? 0;
+                  return (
+                    <Link
+                      key={track.id}
+                      href={`/tracks/${track.id}`}
+                      className="flex items-center justify-between rounded-2xl border border-kanah-border bg-kanah-surface px-5 py-4 active:scale-[0.98]"
+                    >
+                      <div>
+                        <p className="text-[18px] font-bold text-kanah-accent">{track.word}</p>
+                        <p className="text-[12px] text-kanah-muted">{track.subtitle}</p>
+                      </div>
+                      <span className="text-[11px] text-kanah-locked">
+                        {toArabicNumeral(completed)}/{toArabicNumeral(track.totalStories)}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </motion.div>
+            )}
           </motion.div>
         </section>
       )}

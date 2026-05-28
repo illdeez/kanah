@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getStory, getTrack, toArabicNumeral } from "@/data/days";
-import { savePledge, saveReflection } from "@/lib/storage";
+import { getUserData, savePledge, saveReflection } from "@/lib/storage";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -30,12 +30,13 @@ export default function CompleteStoryPage() {
 
   const track = getTrack(trackId);
   const story = getStory(trackId, storyId);
+  const isCompleted = !!getUserData().completedStoriesByTrack[trackId]?.includes(storyId);
 
   useEffect(() => {
-    if (!track || !story) router.replace("/");
-  }, [track, story, router]);
+    if (!track || !story || !isCompleted) router.replace(`/tracks/${trackId}`);
+  }, [track, story, isCompleted, router, trackId]);
 
-  if (!track || !story) return null;
+  if (!track || !story || !isCompleted) return null;
 
   function handleSaveLine() {
     if (!selectedLine) return;

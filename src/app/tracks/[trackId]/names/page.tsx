@@ -43,7 +43,6 @@ export default function NamesListPage() {
     const data = getUserData();
     setUserData(data);
     setDevMode(isDevMode());
-    setActiveTrack(trackId);
   }, [trackId]);
 
   const track = getNamesTrack(trackId);
@@ -57,6 +56,12 @@ export default function NamesListPage() {
   const progress = getNamesTrackProgress(trackId, userData.completedNamesByTrack);
   const completedNames = userData.completedNamesByTrack[trackId] ?? [];
   const completedNameStoriesByTrack = userData.completedNameStoriesByTrack ?? {};
+  const isActiveTrack = userData.activeTrackId === trackId;
+
+  function handleSelectTrack() {
+    setActiveTrack(trackId);
+    setUserData(getUserData());
+  }
 
   return (
     <main className="flex flex-col min-h-screen pb-24">
@@ -115,6 +120,17 @@ export default function NamesListPage() {
           </div>
         </div>
       </section>
+
+      {!isActiveTrack && (
+        <section className="px-6 pb-6">
+          <button
+            onClick={handleSelectTrack}
+            className="block w-full text-center py-4 rounded-2xl text-[16px] font-semibold bg-kanah-accent text-white shadow-accent active:scale-[0.98]"
+          >
+            تابع رحلتك من هنا
+          </button>
+        </section>
+      )}
 
       {/* Search */}
       <section className="px-4 pb-4">

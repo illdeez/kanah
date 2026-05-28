@@ -7,9 +7,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getName, getNamesTrack, toArabicNumeral } from "@/data/days";
 import {
   completeName,
+  getTodayRead,
   getUserData,
   isDevMode,
-  setActiveTrack,
   UserData,
 } from "@/lib/storage";
 
@@ -61,7 +61,6 @@ export default function NamePage() {
   useEffect(() => {
     setUserData(getUserData());
     setDevMode(isDevMode());
-    setActiveTrack(trackId);
   }, [trackId]);
 
   const track = getNamesTrack(trackId);
@@ -70,6 +69,17 @@ export default function NamePage() {
   const isCompleted = userData
     ? (userData.completedNamesByTrack[trackId] ?? []).includes(nameId)
     : false;
+  const todayRead = userData ? getTodayRead(userData) : null;
+  const todayTrackRead =
+    todayRead &&
+    todayRead.itemType === "name" &&
+    todayRead.trackId === trackId
+      ? todayRead
+      : null;
+  const blockedByDaily =
+    !isCompleted &&
+    !!todayTrackRead &&
+    !(todayTrackRead.nameId === nameId);
 
   useEffect(() => {
     if (!userData) return;
@@ -105,6 +115,35 @@ export default function NamePage() {
   if (!name.contentReady && !devMode) {
     router.replace(`/tracks/${trackId}/names`);
     return null;
+  }
+
+  if (blockedByDaily) {
+    return (
+      <main className="flex flex-col min-h-screen">
+        <header className="sticky top-0 z-40 bg-kanah-bg/95 backdrop-blur-sm border-b border-kanah-border">
+          <div className="flex items-center gap-3 px-4 h-14">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-kanah-border transition-colors"
+              aria-label="رجوع"
+            >
+              <ChevronRight size={20} className="text-kanah-muted" />
+            </button>
+          </div>
+        </header>
+        <div className="flex-1 flex flex-col items-center justify-center px-8 text-center gap-6">
+          <span className="text-[48px] text-kanah-accent-muted block">✦</span>
+          <div>
+            <p className="text-[22px] font-bold text-kanah-text mb-3">
+              خذ وقتك مع معنى اليوم
+            </p>
+            <p className="text-[16px] text-kanah-muted leading-[2]">
+              خذ وقتك مع معنى اليوم… القراءة التالية في هذا المسار تُفتح غداً.
+            </p>
+          </div>
+        </div>
+      </main>
+    );
   }
 
   function handleComplete() {

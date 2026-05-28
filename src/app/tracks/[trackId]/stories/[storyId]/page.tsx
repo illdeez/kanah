@@ -11,7 +11,6 @@ import {
   getUserData,
   isDevMode,
   isDevUnlimited,
-  setActiveTrack,
   UserData,
 } from "@/lib/storage";
 
@@ -65,7 +64,6 @@ export default function StoryPage() {
     setUserData(getUserData());
     setDevMode(isDevMode());
     setDevUnlimited(isDevUnlimited());
-    if (getTrack(trackId)) setActiveTrack(trackId);
   }, [trackId]);
 
   const track = getTrack(trackId);
@@ -73,12 +71,12 @@ export default function StoryPage() {
   const isCompleted = userData
     ? (userData.completedStoriesByTrack[trackId] ?? []).includes(storyId)
     : false;
-  const todayRead = userData ? getTodayTrackRead(userData, trackId) : null;
+  const todayTrackRead = userData ? getTodayTrackRead(userData, trackId) : null;
   const blockedByDaily =
     !devUnlimited &&
     !isCompleted &&
-    !!todayRead &&
-    !(todayRead.itemType !== "name" && todayRead.storyId === storyId);
+    !!todayTrackRead &&
+    !(todayTrackRead.itemType !== "name" && todayTrackRead.storyId === storyId);
 
   useEffect(() => {
     if (!userData) return;
@@ -146,10 +144,10 @@ export default function StoryPage() {
             transition={{ ease, duration: 0.45, delay: 0.2 }}
           >
             <p className="text-[22px] font-bold text-kanah-text mb-3">
-              يكفيك معنى واحد اليوم
+              خذ وقتك مع معنى اليوم
             </p>
             <p className="text-[16px] text-kanah-muted leading-[2]">
-              عُد غداً لتعيش معنى جديداً.
+              خذ وقتك مع معنى اليوم… القصة التالية في هذا المسار تُفتح غداً.
             </p>
           </motion.div>
         </div>

@@ -16,7 +16,14 @@ import {
   isWordTrack,
   toArabicNumeral,
 } from "@/data/days";
-import { getTodayTrackRead, getUserData, isDevMode, isDevUnlimited, setActiveTrack, UserData } from "@/lib/storage";
+import {
+  getTodayTrackRead,
+  getUserData,
+  isDevMode,
+  isDevUnlimited,
+  setActiveTrack,
+  UserData,
+} from "@/lib/storage";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 const listContainer = {
@@ -42,7 +49,6 @@ export default function TrackPage() {
     setUserData(data);
     setDevMode(isDevMode());
     setDevUnlimited(isDevUnlimited());
-    if (getTrack(trackId)) setActiveTrack(trackId);
   }, [trackId]);
 
   const track = getTrack(trackId);
@@ -63,11 +69,17 @@ export default function TrackPage() {
 
   const isReady = hasReadyStories(wordTrack, devMode);
   const progress = getTrackProgress(wordTrack.id, userData.completedStoriesByTrack);
-  const todayRead = getTodayTrackRead(userData, trackId);
-  const hasDoneToday = !!todayRead && !devUnlimited;
+  const todayTrackRead = getTodayTrackRead(userData, trackId);
+  const hasDoneToday = !!todayTrackRead && !devUnlimited;
+  const isActiveTrack = userData.activeTrackId === trackId;
   const nextStory = hasDoneToday
     ? null
     : getNextAvailableStory(wordTrack.id, userData.completedStoriesByTrack, devMode);
+
+  function handleSelectTrack() {
+    setActiveTrack(trackId);
+    setUserData(getUserData());
+  }
 
   return (
     <main className="flex flex-col min-h-screen pb-10">
@@ -125,10 +137,19 @@ export default function TrackPage() {
         </div>
       </section>
 
-      {hasDoneToday ? (
+      {!isActiveTrack ? (
+        <section className="px-6 pb-8">
+          <button
+            onClick={handleSelectTrack}
+            className="block w-full text-center py-4 rounded-2xl text-[16px] font-semibold bg-kanah-accent text-white shadow-accent active:scale-[0.98]"
+          >
+            تابع رحلتك من هنا
+          </button>
+        </section>
+      ) : hasDoneToday ? (
         <section className="px-6 pb-8">
           <div className="w-full text-center py-4 rounded-2xl text-[15px] font-semibold bg-kanah-surface border border-kanah-border text-kanah-muted">
-            يكفيك معنى واحد اليوم · عُد غداً لتعيش معنى جديداً
+            أتممت قصة اليوم في هذا المسار. القصة التالية تُفتح غداً.
           </div>
         </section>
       ) : nextStory ? (
@@ -161,7 +182,10 @@ export default function TrackPage() {
             );
             const isComingSoon = !story.contentReady && !devMode;
             const blockedByDaily = hasDoneToday && status === "available";
-            const canOpen = !isComingSoon && status !== "locked" && !blockedByDaily;
+            const canOpen =
+              !isComingSoon &&
+              status !== "locked" &&
+              !blockedByDaily;
 
             const card = (
               <motion.div
@@ -188,7 +212,7 @@ export default function TrackPage() {
                     </span>
                   ) : blockedByDaily ? (
                     <span className="text-[11px] font-semibold text-kanah-locked bg-kanah-border px-2.5 py-1 rounded-full">
-                      غداً
+                      تفتح غداً
                     </span>
                   ) : status === "available" ? (
                     <span className="text-[11px] font-semibold text-kanah-accent bg-kanah-accent-subtle px-2.5 py-1 rounded-full">

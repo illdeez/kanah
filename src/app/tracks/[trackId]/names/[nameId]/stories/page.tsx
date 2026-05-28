@@ -42,7 +42,6 @@ export default function NameStoriesPage() {
     setUserData(data);
     setDevMode(isDevMode());
     setDevUnlimited(isDevUnlimited());
-    setActiveTrack(trackId);
   }, [trackId]);
 
   const track = getNamesTrack(trackId);
@@ -60,13 +59,22 @@ export default function NameStoriesPage() {
 
   const completedStoryIds =
     userData.completedNameStoriesByTrack?.[trackId]?.[nameId] ?? [];
-  const todayRead = getTodayTrackRead(userData, trackId);
-  const hasDoneToday = !!todayRead && !devUnlimited;
+  const todayTrackRead = getTodayTrackRead(userData, trackId);
+  const hasDoneToday = !!todayTrackRead && !devUnlimited;
+  const isActiveTrack = userData.activeTrackId === trackId;
   const progress = completedStoryIds.length;
   const total = name.stories.length;
 
   // Find next available story (first not completed)
-  const nextStory = name.stories.find((s) => !completedStoryIds.includes(s.id));
+    const nextStory =
+    !hasDoneToday && isActiveTrack
+      ? name.stories.find((s) => !completedStoryIds.includes(s.id))
+      : undefined;
+
+  function handleSelectTrack() {
+    setActiveTrack(trackId);
+    setUserData(getUserData());
+  }
 
   return (
     <main className="flex flex-col min-h-screen pb-24" dir="rtl">
@@ -124,10 +132,19 @@ export default function NameStoriesPage() {
       </section>
 
       {/* Daily limit banner or CTA */}
-      {hasDoneToday ? (
+      {!isActiveTrack ? (
+        <section className="px-6 pb-8">
+          <button
+            onClick={handleSelectTrack}
+            className="block w-full text-center py-4 rounded-2xl text-[16px] font-semibold bg-kanah-accent text-white shadow-accent active:scale-[0.98]"
+          >
+            تابع رحلتك من هنا
+          </button>
+        </section>
+      ) : hasDoneToday ? (
         <section className="px-6 pb-8">
           <div className="w-full text-center py-4 rounded-2xl text-[15px] font-semibold bg-kanah-surface border border-kanah-border text-kanah-muted">
-            يكفيك قصة واحدة اليوم · عُد غداً للقصة التالية
+            أتممت قصة اليوم في هذا المسار. القصة التالية تُفتح غداً.
           </div>
         </section>
       ) : nextStory ? (
@@ -163,7 +180,10 @@ export default function NameStoriesPage() {
               !devMode;
             const blockedByDaily =
               hasDoneToday && !isCompleted && !isLocked && !isComingSoon;
-            const canOpen = !isComingSoon && !isLocked && !blockedByDaily;
+            const canOpen =
+              !isComingSoon &&
+              !isLocked &&
+              !blockedByDaily;
 
             const card = (
               <motion.div
@@ -190,7 +210,7 @@ export default function NameStoriesPage() {
                     </span>
                   ) : blockedByDaily ? (
                     <span className="text-[11px] font-semibold text-kanah-locked bg-kanah-border px-2.5 py-1 rounded-full">
-                      غداً
+                      تفتح غداً
                     </span>
                   ) : isLocked ? (
                     <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-kanah-locked bg-kanah-border px-2.5 py-1 rounded-full">

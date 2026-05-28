@@ -11,7 +11,6 @@ import {
   getUserData,
   isDevMode,
   isDevUnlimited,
-  setActiveTrack,
   UserData,
 } from "@/lib/storage";
 
@@ -66,7 +65,6 @@ export default function NameStoryPage() {
     setUserData(getUserData());
     setDevMode(isDevMode());
     setDevUnlimited(isDevUnlimited());
-    setActiveTrack(trackId);
   }, [trackId]);
 
   const track = getNamesTrack(trackId);
@@ -95,15 +93,15 @@ export default function NameStoryPage() {
     return () => obs.disconnect();
   }, [userData, isCompleted]);
 
-  const todayRead = userData ? getTodayTrackRead(userData, trackId) : null;
+  const todayTrackRead = userData ? getTodayTrackRead(userData, trackId) : null;
   const blockedByDaily =
     !devUnlimited &&
     !isCompleted &&
-    !!todayRead &&
+    !!todayTrackRead &&
     !(
-      todayRead.itemType === "nameStory" &&
-      todayRead.nameId === nameId &&
-      todayRead.storyId === storyId
+      todayTrackRead.itemType === "nameStory" &&
+      todayTrackRead.nameId === nameId &&
+      todayTrackRead.storyId === storyId
     );
 
   useEffect(() => {
@@ -149,10 +147,10 @@ export default function NameStoryPage() {
             transition={{ ease, duration: 0.45, delay: 0.2 }}
           >
             <p className="text-[22px] font-bold text-kanah-text mb-3">
-              يكفيك قصة واحدة اليوم
+              خذ وقتك مع معنى اليوم
             </p>
             <p className="text-[16px] text-kanah-muted leading-[2]">
-              عُد غداً للقصة التالية.
+              خذ وقتك مع معنى اليوم… القصة التالية في هذا المسار تُفتح غداً.
             </p>
           </motion.div>
         </div>

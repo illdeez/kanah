@@ -69,7 +69,8 @@ export default function LibraryPage() {
               track.id,
               userData.completedNamesByTrack
             );
-            const canClick = true; // names list is always browsable
+            const isReady = hasReadyNames(track, devMode);
+            const canClick = true;
 
             const CardContent = (
               <motion.div
@@ -87,12 +88,16 @@ export default function LibraryPage() {
                       isActive ? (
                         <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-kanah-accent bg-kanah-accent-subtle px-2.5 py-1 rounded-full">
                           <Sparkles size={11} />
-                          المسار النشط
+                          آخر مسار قرأته
                         </span>
                       ) : progress > 0 ? (
                         <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-kanah-completed bg-emerald-50 px-2.5 py-1 rounded-full">
                           <CheckCircle2 size={11} />
                           بدأت هذا المسار
+                        </span>
+                      ) : !isReady ? (
+                        <span className="text-[11px] font-semibold text-kanah-locked bg-kanah-border px-2.5 py-1 rounded-full">
+                          قيد الإعداد
                         </span>
                       ) : (
                         <span className="text-[11px] font-semibold text-kanah-muted bg-kanah-surface px-2.5 py-1 rounded-full">
@@ -171,12 +176,16 @@ export default function LibraryPage() {
                     isActive ? (
                       <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-kanah-accent bg-kanah-accent-subtle px-2.5 py-1 rounded-full">
                         <Sparkles size={11} />
-                        المسار النشط
+                        آخر مسار قرأته
                       </span>
-                    ) : progress > 0 ? (
+                  ) : progress > 0 ? (
                       <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-kanah-completed bg-emerald-50 px-2.5 py-1 rounded-full">
                         <CheckCircle2 size={11} />
                         بدأت هذا المسار
+                      </span>
+                    ) : !isReady ? (
+                      <span className="text-[11px] font-semibold text-kanah-locked bg-kanah-border px-2.5 py-1 rounded-full">
+                        قيد الإعداد
                       </span>
                     ) : (
                       <span className="text-[11px] font-semibold text-kanah-muted bg-kanah-surface px-2.5 py-1 rounded-full">
