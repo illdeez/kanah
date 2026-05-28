@@ -14,7 +14,6 @@ import {
 import {
   getUserData,
   isDevMode,
-  setActiveTrack,
   UserData,
 } from "@/lib/storage";
 import BottomNav from "@/components/BottomNav";
@@ -56,13 +55,6 @@ export default function NamesListPage() {
   const progress = getNamesTrackProgress(trackId, userData.completedNamesByTrack);
   const completedNames = userData.completedNamesByTrack[trackId] ?? [];
   const completedNameStoriesByTrack = userData.completedNameStoriesByTrack ?? {};
-  const isActiveTrack = userData.activeTrackId === trackId;
-
-  function handleSelectTrack() {
-    setActiveTrack(trackId);
-    setUserData(getUserData());
-  }
-
   return (
     <main className="flex flex-col min-h-screen pb-24">
       {/* Header */}
@@ -110,6 +102,9 @@ export default function NamesListPage() {
         <p className="text-[14px] text-kanah-muted leading-[2] mb-6">
           {track.description}
         </p>
+        <p className="text-[14px] font-semibold text-kanah-text leading-[1.9] mb-6">
+          اختر اسماً لتبدأ رحلتك
+        </p>
 
         <div className="bg-kanah-card border border-kanah-border rounded-2xl p-5">
           <div className="flex items-center justify-between">
@@ -120,17 +115,6 @@ export default function NamesListPage() {
           </div>
         </div>
       </section>
-
-      {!isActiveTrack && (
-        <section className="px-6 pb-6">
-          <button
-            onClick={handleSelectTrack}
-            className="block w-full text-center py-4 rounded-2xl text-[16px] font-semibold bg-kanah-accent text-white shadow-accent active:scale-[0.98]"
-          >
-            تابع رحلتك من هنا
-          </button>
-        </section>
-      )}
 
       {/* Search */}
       <section className="px-4 pb-4">
@@ -182,6 +166,13 @@ export default function NamesListPage() {
               : completedNames.includes(name.id);
             const isComingSoon = !name.contentReady && !devMode;
             const canOpen = !isComingSoon;
+            const ctaLabel = isComingSoon
+              ? "قيد الإعداد"
+              : hasSubStories
+              ? completedSubStories > 0
+                ? "اقرأ قصة اليوم"
+                : `ابدأ مع اسم ${name.name}`
+              : `ابدأ مع اسم ${name.name}`;
 
             const badge = isCompleted ? (
               <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-kanah-completed bg-emerald-50 px-2 py-0.5 rounded-full">
@@ -228,6 +219,13 @@ export default function NamesListPage() {
                 <p className="text-[11px] text-kanah-muted leading-[1.6] line-clamp-2">
                   {name.title}
                 </p>
+                <div
+                  className={`mt-auto pt-2 text-[12px] font-semibold ${
+                    canOpen ? "text-kanah-accent" : "text-kanah-locked"
+                  }`}
+                >
+                  {ctaLabel}
+                </div>
               </motion.div>
             );
 

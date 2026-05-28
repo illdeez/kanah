@@ -61,19 +61,19 @@ export default function NameStoriesPage() {
     userData.completedNameStoriesByTrack?.[trackId]?.[nameId] ?? [];
   const todayTrackRead = getTodayTrackRead(userData, trackId);
   const hasDoneToday = !!todayTrackRead && !devUnlimited;
-  const isActiveTrack = userData.activeTrackId === trackId;
   const progress = completedStoryIds.length;
   const total = name.stories.length;
 
   // Find next available story (first not completed)
-    const nextStory =
-    !hasDoneToday && isActiveTrack
+  const nextStory =
+    !hasDoneToday
       ? name.stories.find((s) => !completedStoryIds.includes(s.id))
       : undefined;
+  const hasReadyStory = name.stories.some((story) => story.contentReady || devMode);
 
-  function handleSelectTrack() {
+  function handleOpenTodayStory() {
     setActiveTrack(trackId);
-    setUserData(getUserData());
+    router.push(`/tracks/${trackId}/names/${nameId}/stories/${nextStory!.id}`);
   }
 
   return (
@@ -132,14 +132,11 @@ export default function NameStoriesPage() {
       </section>
 
       {/* Daily limit banner or CTA */}
-      {!isActiveTrack ? (
+      {!hasReadyStory ? (
         <section className="px-6 pb-8">
-          <button
-            onClick={handleSelectTrack}
-            className="block w-full text-center py-4 rounded-2xl text-[16px] font-semibold bg-kanah-accent text-white shadow-accent active:scale-[0.98]"
-          >
-            تابع رحلتك من هنا
-          </button>
+          <div className="w-full text-center py-4 rounded-2xl text-[15px] font-semibold bg-kanah-surface border border-kanah-border text-kanah-muted">
+            هذا المسار قيد الإعداد.
+          </div>
         </section>
       ) : hasDoneToday ? (
         <section className="px-6 pb-8">
@@ -149,12 +146,12 @@ export default function NameStoriesPage() {
         </section>
       ) : nextStory ? (
         <section className="px-6 pb-8">
-          <Link
-            href={`/tracks/${trackId}/names/${nameId}/stories/${nextStory.id}`}
+          <button
+            onClick={handleOpenTodayStory}
             className="block w-full text-center py-4 rounded-2xl text-[16px] font-semibold bg-kanah-accent text-white shadow-accent active:scale-[0.98]"
           >
-            {progress > 0 ? "تابع القصة المتاحة" : "ابدأ هذه الرحلة"}
-          </Link>
+            {progress > 0 ? "اقرأ قصة اليوم من هذا المسار" : "ابدأ قصة اليوم"}
+          </button>
         </section>
       ) : null}
 

@@ -71,14 +71,13 @@ export default function TrackPage() {
   const progress = getTrackProgress(wordTrack.id, userData.completedStoriesByTrack);
   const todayTrackRead = getTodayTrackRead(userData, trackId);
   const hasDoneToday = !!todayTrackRead && !devUnlimited;
-  const isActiveTrack = userData.activeTrackId === trackId;
   const nextStory = hasDoneToday
     ? null
     : getNextAvailableStory(wordTrack.id, userData.completedStoriesByTrack, devMode);
 
-  function handleSelectTrack() {
+  function handleOpenTodayStory() {
     setActiveTrack(trackId);
-    setUserData(getUserData());
+    router.push(`/tracks/${trackId}/stories/${nextStory!.id}`);
   }
 
   return (
@@ -137,14 +136,11 @@ export default function TrackPage() {
         </div>
       </section>
 
-      {!isActiveTrack ? (
+      {!isReady ? (
         <section className="px-6 pb-8">
-          <button
-            onClick={handleSelectTrack}
-            className="block w-full text-center py-4 rounded-2xl text-[16px] font-semibold bg-kanah-accent text-white shadow-accent active:scale-[0.98]"
-          >
-            تابع رحلتك من هنا
-          </button>
+          <div className="w-full text-center py-4 rounded-2xl text-[15px] font-semibold bg-kanah-surface border border-kanah-border text-kanah-muted">
+            هذا المسار قيد الإعداد.
+          </div>
         </section>
       ) : hasDoneToday ? (
         <section className="px-6 pb-8">
@@ -154,12 +150,12 @@ export default function TrackPage() {
         </section>
       ) : nextStory ? (
         <section className="px-6 pb-8">
-          <Link
-            href={`/tracks/${wordTrack.id}/stories/${nextStory.id}`}
+          <button
+            onClick={handleOpenTodayStory}
             className="block w-full text-center py-4 rounded-2xl text-[16px] font-semibold bg-kanah-accent text-white shadow-accent active:scale-[0.98]"
           >
-            {progress > 0 ? "تابع القصة المتاحة" : "ابدأ هذا المسار"}
-          </Link>
+            {progress > 0 ? "اقرأ قصة اليوم من هذا المسار" : "ابدأ قصة اليوم"}
+          </button>
         </section>
       ) : null}
 
