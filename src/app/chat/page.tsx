@@ -9,8 +9,9 @@ const chat = createAgentChat({
 })
 
 export default function ChatPage() {
-  const { messages, input, handleInputChange, handleSubmit, status, stop, error } =
-    useChat({ chat })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { messages, handleSubmit, status, stop, error } =
+    useChat({ chat } as any) as any
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
