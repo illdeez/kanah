@@ -21,6 +21,7 @@ import {
 } from "@/lib/storage";
 import { motion } from "framer-motion";
 import BottomNav from "@/components/BottomNav";
+import PageHeader from "@/components/PageHeader";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -40,6 +41,15 @@ const listItem = {
   hidden: { opacity: 0, y: 10 },
   show: { opacity: 1, y: 0, transition: { ease, duration: 0.4 } },
 };
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="flex items-center gap-2.5 text-[11px] font-semibold text-kanah-accent-muted tracking-[0.18em] mb-4">
+      <span className="w-5 h-px bg-kanah-accent-muted/60" />
+      {children}
+    </h2>
+  );
+}
 
 export default function TracePage() {
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -108,43 +118,27 @@ export default function TracePage() {
       ? "مرة واحدة انتظرت قبل أن ترد."
       : `${toArabicNumeral(doneCount)} مرات استطعت أن تحوّل المعنى إلى فعل.`;
 
-  const triedCaption =
-    triedCount === 0
-      ? "حتى قبل النتيجة، يكفي أنك بدأت تلاحظ اللحظة."
-      : triedCount === 1
-      ? "بدأت تلاحظ لحظة الغضب قبل أن تقودك."
-      : "محاولاتك المتكررة تعني أن المعنى صار حاضراً في وعيك.";
+  const stats = [
+    { value: totalCompleted, label: "قصة أتممتها", caption: completedCaption },
+    { value: totalDays, label: "يوم عشت فيه معنى", caption: null },
+    { value: totalCommitments, label: "تعهداً أخذته", caption: pledgeCaption },
+    { value: doneCount, label: "مرة طبّقته", caption: doneCaption },
+  ];
 
   return (
-    <main className="flex flex-col min-h-screen pb-24">
-      <motion.header
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ ease, duration: 0.45 }}
-        className="px-6 pt-12 pb-6"
-      >
-        <div className="flex items-end justify-between">
-          <div>
-            <p className="text-[11px] font-semibold tracking-[0.3em] text-kanah-accent-muted mb-1.5">
-              أثري
-            </p>
-            <h1 className="text-[28px] font-extrabold text-kanah-text leading-none">
-              أثرك
-            </h1>
-          </div>
-          <p className="text-[11px] text-kanah-locked pb-0.5">معانٍ تحوّلت إلى فعل</p>
-        </div>
-        <div className="mt-5 h-px bg-kanah-border" />
-      </motion.header>
+    <main className="flex flex-col min-h-screen pb-32 relative">
+      <PageHeader title="أثري" tagline="معانٍ تحوّلت إلى فعل" />
 
       {todayRead && todayTrack && todayStory && (
-        <div className="px-6 mb-8">
-          <div className="bg-kanah-card border border-kanah-border rounded-2xl p-5">
-            <p className="text-[11px] font-semibold text-kanah-completed tracking-widest uppercase mb-2">
+        <div className="px-6 mb-8 relative z-10">
+          <div className="rounded-[26px] border border-kanah-completed/25 bg-kanah-completed-subtle p-6">
+            <p className="text-[11px] font-semibold text-kanah-completed tracking-[0.15em] mb-3">
               ✓ معنى اليوم
             </p>
-            <p className="text-[19px] font-bold text-kanah-accent mb-1">{todayTrack.word}</p>
-            <p className="text-[14px] text-kanah-text">{todayStory.title}</p>
+            <p className="font-display text-[28px] text-kanah-text leading-tight mb-1">
+              {todayTrack.word}
+            </p>
+            <p className="text-[13.5px] text-kanah-muted">{todayStory.title}</p>
           </div>
         </div>
       )}
@@ -153,61 +147,37 @@ export default function TracePage() {
         variants={gridContainer}
         initial="hidden"
         animate="show"
-        className="px-6 grid grid-cols-2 gap-4 mb-10"
+        className="px-6 grid grid-cols-2 gap-3 mb-12 relative z-10"
       >
-        <motion.div variants={gridCard} className="bg-kanah-card rounded-2xl p-5 border border-kanah-border">
-          <span className="text-[42px] font-extrabold text-kanah-accent leading-none block tabular-nums">
-            {toArabicNumeral(totalCompleted)}
-          </span>
-          <span className="text-[12px] text-kanah-muted mt-2 block leading-snug">
-            قصة أتممتها
-          </span>
-          <p className="text-[12px] text-kanah-muted leading-[1.8] mt-3">
-            {completedCaption}
-          </p>
-        </motion.div>
-        <motion.div variants={gridCard} className="bg-kanah-card rounded-2xl p-5 border border-kanah-border">
-          <span className="text-[42px] font-extrabold text-kanah-accent leading-none block tabular-nums">
-            {toArabicNumeral(totalDays)}
-          </span>
-          <span className="text-[12px] text-kanah-muted mt-2 block leading-snug">
-            يوم عشت فيه معنى
-          </span>
-        </motion.div>
-        <motion.div variants={gridCard} className="bg-kanah-card rounded-2xl p-5 border border-kanah-border">
-          <span className="text-[42px] font-extrabold text-kanah-accent leading-none block tabular-nums">
-            {toArabicNumeral(totalCommitments)}
-          </span>
-          <span className="text-[12px] text-kanah-muted mt-2 block leading-snug">
-            تعهداً أخذته
-          </span>
-          <p className="text-[12px] text-kanah-muted leading-[1.8] mt-3">
-            {pledgeCaption}
-          </p>
-        </motion.div>
-        <motion.div variants={gridCard} className="bg-kanah-card rounded-2xl p-5 border border-kanah-border">
-          <span className="text-[42px] font-extrabold text-kanah-accent leading-none block tabular-nums">
-            {toArabicNumeral(doneCount)}
-          </span>
-          <span className="text-[12px] text-kanah-muted mt-2 block leading-snug">
-            مرة طبّقته
-          </span>
-          <p className="text-[12px] text-kanah-muted leading-[1.8] mt-3">
-            {doneCaption}
-          </p>
-        </motion.div>
+        {stats.map(({ value, label, caption }) => (
+          <motion.div
+            key={label}
+            variants={gridCard}
+            className="rounded-[26px] bg-kanah-card border border-kanah-border p-5"
+          >
+            <span className="font-display text-[46px] text-kanah-accent leading-none block tabular-nums">
+              {toArabicNumeral(value)}
+            </span>
+            <span className="text-[12px] text-kanah-muted mt-2.5 block leading-snug">
+              {label}
+            </span>
+            {caption && (
+              <p className="text-[11.5px] text-kanah-locked leading-[1.8] mt-3">
+                {caption}
+              </p>
+            )}
+          </motion.div>
+        ))}
       </motion.div>
 
-      <div className="px-6 mb-10">
-        <h2 className="text-[10px] font-semibold text-kanah-locked tracking-widest uppercase mb-4">
-          تقدّمك في الكلمات
-        </h2>
+      <div className="px-6 mb-12 relative z-10">
+        <SectionTitle>تقدّمك في الكلمات</SectionTitle>
         <motion.div
           variants={listContainer}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
-          className="flex flex-col gap-3"
+          className="rounded-[26px] border border-kanah-border bg-kanah-card divide-y divide-kanah-border overflow-hidden"
         >
           {wordTracks.map((track) => {
             const progress = isNamesTrack(track)
@@ -224,21 +194,26 @@ export default function TracePage() {
               <motion.div
                 key={track.id}
                 variants={listItem}
-                className="bg-kanah-card rounded-2xl border border-kanah-border px-5 py-4"
+                className="px-6 py-4"
               >
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center justify-between gap-4 mb-2.5">
                   <div>
-                    <p className="text-[17px] font-bold text-kanah-text">
+                    <p className="text-[15.5px] font-bold text-kanah-text">
                       {track.word}
                     </p>
-                    <p className="text-[12px] text-kanah-muted mt-1">
+                    <p className="text-[11.5px] text-kanah-muted mt-0.5">
                       {track.subtitle}
                     </p>
                   </div>
-                  <span className="text-[13px] font-semibold text-kanah-accent">
-                    {toArabicNumeral(progress)} من{" "}
-                    {toArabicNumeral(total)}
+                  <span className="text-[12.5px] font-semibold text-kanah-accent tabular-nums shrink-0">
+                    {toArabicNumeral(progress)} من {toArabicNumeral(total)}
                   </span>
+                </div>
+                <div className="h-1 bg-kanah-border rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-kanah-accent rounded-full transition-all duration-700"
+                    style={{ width: `${total > 0 ? (progress / total) * 100 : 0}%` }}
+                  />
                 </div>
               </motion.div>
             );
@@ -247,41 +222,48 @@ export default function TracePage() {
       </div>
 
       {enrichedReflections.length > 0 ? (
-        <div className="px-6 flex flex-col">
-          <h2 className="text-[10px] font-semibold text-kanah-locked tracking-widest uppercase mb-4">
-            الجمل التي بقيت فيك
-          </h2>
+        <div className="px-6 flex flex-col relative z-10">
+          <SectionTitle>الجمل التي بقيت فيك</SectionTitle>
           <motion.div
             variants={listContainer}
             initial="hidden"
             whileInView="show"
             viewport={{ once: true }}
-            className="flex flex-col divide-y divide-kanah-border"
+            className="flex flex-col gap-4"
           >
             {enrichedReflections.map((reflection) => (
-              <motion.div key={`${reflection.trackId}-${reflection.storyId}`} variants={listItem} className="py-5">
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <span className="text-[11px] font-semibold text-kanah-accent bg-kanah-accent-subtle px-2.5 py-1 rounded-full">
+              <motion.div
+                key={`${reflection.trackId}-${reflection.storyId}`}
+                variants={listItem}
+                className="rounded-[26px] border border-kanah-border bg-kanah-card p-6 relative overflow-hidden"
+              >
+                <span
+                  aria-hidden
+                  className="font-display absolute top-3 start-5 text-[64px] leading-none text-kanah-accent-subtle select-none"
+                >
+                  ”
+                </span>
+                <blockquote className="font-display text-[20px] leading-[2] text-kanah-text relative mb-5 pt-4">
+                  {reflection.selectedLine}
+                </blockquote>
+                <div className="flex flex-wrap items-center gap-2 relative">
+                  <span className="text-[11px] font-semibold text-kanah-accent bg-kanah-accent-subtle px-3 py-1 rounded-full">
                     {reflection.track!.word}
                   </span>
-                  <span className="text-[11px] text-kanah-text">
-                    القصة {toArabicNumeral(reflection.story!.storyNumber)}:
-                    {" "}{reflection.story!.title}
+                  <span className="text-[11px] text-kanah-muted">
+                    {reflection.story!.title}
+                  </span>
+                  <span className="text-[10.5px] text-kanah-locked ms-auto">
+                    {formatArabicDate(reflection.createdAt)}
                   </span>
                 </div>
-                <p className="text-[11px] text-kanah-locked mb-3">
-                  {formatArabicDate(reflection.createdAt)}
-                </p>
-                <blockquote className="text-[18px] leading-[1.9] text-kanah-text font-medium">
-                  “{reflection.selectedLine}”
-                </blockquote>
               </motion.div>
             ))}
           </motion.div>
         </div>
       ) : (
-        <div className="flex-1 flex flex-col items-center justify-center text-center px-10 py-16 gap-5">
-          <span className="text-[30px] text-kanah-border">✦</span>
+        <div className="flex-1 flex flex-col items-center justify-center text-center px-10 py-16 gap-5 relative z-10">
+          <span className="font-display text-[36px] text-kanah-accent-muted">✦</span>
           <p className="text-kanah-muted text-[15px] leading-[1.9]">
             لم تحفظ جملة بعد.
             <br />
@@ -290,21 +272,19 @@ export default function TracePage() {
         </div>
       )}
 
-      <div className="px-6 mt-10">
-        <h2 className="text-[10px] font-semibold text-kanah-locked tracking-widest uppercase mb-4">
-          آخر تعهد
-        </h2>
+      <div className="px-6 mt-12 relative z-10">
+        <SectionTitle>آخر تعهد</SectionTitle>
         {latestPledge && latestPledgeTrack && latestPledgeStory ? (
-          <div className="bg-kanah-card rounded-2xl border border-kanah-border p-5">
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              <span className="text-[11px] font-semibold text-kanah-accent bg-kanah-accent-subtle px-2.5 py-1 rounded-full">
+          <div className="rounded-[26px] border border-kanah-accent/20 bg-kanah-accent-subtle p-6">
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              <span className="text-[11px] font-semibold text-kanah-accent bg-kanah-card px-3 py-1 rounded-full">
                 {latestPledgeTrack.word}
               </span>
-              <span className="text-[11px] text-kanah-text">
-                القصة {toArabicNumeral(latestPledgeStory.storyNumber)}: {latestPledgeStory.title}
+              <span className="text-[11px] text-kanah-muted">
+                {latestPledgeStory.title}
               </span>
             </div>
-            <p className="text-[16px] leading-[1.9] text-kanah-text mb-3">
+            <p className="text-[15.5px] leading-[2] text-kanah-text mb-3">
               {latestPledge.pledgeText}
             </p>
             <p className="text-[12px] text-kanah-muted">
@@ -321,30 +301,19 @@ export default function TracePage() {
             </p>
           </div>
         ) : (
-          <div className="bg-kanah-card rounded-2xl border border-kanah-border p-5">
-            <p className="text-[15px] text-kanah-muted leading-[1.9]">
+          <div className="rounded-[26px] border border-kanah-border bg-kanah-card p-6">
+            <p className="text-[14px] text-kanah-muted leading-[1.9]">
               لم تأخذ تعهداً بعد. بعد إكمال قصة وحفظ الجملة التي بقيت فيك، سيظهر تعهدك هنا.
             </p>
           </div>
         )}
       </div>
 
-      <div className="px-6 mt-10">
-        <h2 className="text-[10px] font-semibold text-kanah-locked tracking-widest uppercase mb-4">
-          نتائج التعهدات
-        </h2>
-        <div className="bg-kanah-card rounded-2xl border border-kanah-border p-5">
-          <p className="text-[15px] text-kanah-muted leading-[1.9]">
-            هذا القسم سيتوسّع لاحقاً ليربط كل تعهد بنتيجته عبر الزمن، حتى ترى كيف انتقل المعنى من القراءة إلى السلوك.
-          </p>
-        </div>
-      </div>
-
       {devMode && (
-        <div className="px-6 mt-10">
+        <div className="px-6 mt-12 relative z-10">
           <button
             onClick={handleReset}
-            className="w-full py-3 rounded-xl text-[13px] font-medium text-red-500 border border-red-200 bg-red-50 transition-colors active:bg-red-100"
+            className="w-full py-3 rounded-full text-[13px] font-medium text-red-400 border border-red-400/30 bg-red-400/5 transition-colors active:bg-red-400/10"
           >
             مسح بيانات الاختبار
           </button>

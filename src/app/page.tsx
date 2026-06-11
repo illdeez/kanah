@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 import {
   getNextAvailableStory,
@@ -25,6 +25,7 @@ import {
   UserData,
 } from "@/lib/storage";
 import BottomNav from "@/components/BottomNav";
+import PageHeader from "@/components/PageHeader";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -67,11 +68,6 @@ export default function HomePage() {
     ? getStory(activePledge.trackId, activePledge.storyId)
     : null;
 
-  const todayTrack = todayRead ? getTrack(todayRead.trackId) : null;
-  const todayStory =
-    todayRead && todayRead.itemType !== "name" && todayRead.storyId != null
-      ? getStory(todayRead.trackId, todayRead.storyId)
-      : null;
   const todayStoryId = todayRead?.storyId ?? null;
   const todayReflection =
     todayRead && todayStoryId != null
@@ -112,110 +108,82 @@ export default function HomePage() {
   }
 
   return (
-    <main className="flex flex-col min-h-screen pb-28">
+    <main className="flex flex-col min-h-screen pb-32 relative">
+      <PageHeader title="اليوم" tagline="معانٍ تعيش معك" />
 
-      {/* ── HEADER ── */}
-      <motion.header
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, ease }}
-        className="px-6 pt-12 pb-6"
-      >
-        <div className="flex items-end justify-between">
-          <div>
-            <p className="text-[11px] font-semibold tracking-[0.3em] text-kanah-accent-muted mb-1.5">
-              كَنْه
-            </p>
-            <h2 className="text-[30px] font-extrabold text-kanah-text leading-none">
-              اليوم
-            </h2>
-          </div>
-          <p className="text-[11px] text-kanah-locked pb-0.5">معانٍ تعيش معك</p>
-        </div>
-        <div className="mt-5 h-px bg-kanah-border" />
-      </motion.header>
-
-      {/* ── DONE TODAY ── */}
       {activeTrackHasDoneToday &&
       activeTrack &&
       activeTrackTodayRead &&
       activeTrackTodayStory ? (
-        <section className="px-6">
+        /* ── DONE TODAY ── */
+        <section className="px-6 relative z-10">
           <motion.div
             variants={container}
             initial="hidden"
             animate="show"
-            className="bg-kanah-card border border-kanah-border rounded-[28px] p-6"
+            className="rounded-[32px] bg-kanah-card border border-kanah-border p-7 overflow-hidden relative"
           >
-            {/* Completion badge */}
-            <motion.div variants={item} className="mb-5">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-kanah-completed/10 text-kanah-completed text-[11px] font-semibold">
+            <motion.div variants={item} className="mb-6">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-kanah-completed-subtle text-kanah-completed text-[11.5px] font-semibold">
                 <span className="w-1.5 h-1.5 rounded-full bg-kanah-completed" />
                 قصة اليوم اكتملت
               </span>
             </motion.div>
 
-            {/* Heading */}
+            <motion.p
+              variants={item}
+              className="font-display text-[44px] text-kanah-accent leading-none mb-5"
+            >
+              {activeTrack.word}
+            </motion.p>
+
             <motion.h1
               variants={item}
-              className="text-[26px] font-extrabold text-kanah-text leading-[1.45] mb-1"
+              className="text-[20px] font-bold text-kanah-text leading-[1.6] mb-1.5"
             >
               أتممت قصة اليوم
-              <br />
-              <span className="text-kanah-accent">من {activeTrack.word}</span>
             </motion.h1>
 
             <motion.p
               variants={item}
-              className="text-[15px] font-semibold text-kanah-muted mb-5"
+              className="text-[14.5px] text-kanah-muted mb-6"
             >
               {activeTrackTodayStory.title}
             </motion.p>
 
-            <motion.p
-              variants={item}
-              className="text-[13px] text-kanah-locked leading-[1.9] border-t border-kanah-border pt-4 mb-5"
-            >
-              يمكنك عيش أكثر من معنى اليوم، لكن كل مسار يفتح لك قصة واحدة يومياً.
-            </motion.p>
-
-            {/* Reflection */}
             {todayReflection && (
               <motion.div
                 variants={item}
-                className="bg-kanah-accent-subtle rounded-2xl px-5 py-4 mb-5"
+                className="rounded-[22px] bg-kanah-accent-subtle px-6 py-5 mb-6"
               >
-                <p className="text-[10px] font-semibold text-kanah-accent-muted tracking-[0.2em] uppercase mb-2.5">
+                <p className="text-[10.5px] font-semibold text-kanah-accent-muted tracking-[0.18em] mb-3">
                   الجملة التي بقيت فيك
                 </p>
-                <p className="text-[15px] leading-[2] text-kanah-text font-medium">
+                <p className="font-display text-[18px] leading-[2] text-kanah-text">
                   {todayReflection.selectedLine}
                 </p>
               </motion.div>
             )}
 
-            {/* Pledge */}
             {activePledge && activePledgeTrack && activePledgeStory && (
               <motion.div
                 variants={item}
-                className="border-t border-kanah-border pt-5"
+                className="border-t border-kanah-border pt-6"
               >
-                <p className="text-[10px] font-semibold text-kanah-accent-muted tracking-[0.2em] uppercase mb-2">
+                <p className="text-[10.5px] font-semibold text-kanah-accent-muted tracking-[0.18em] mb-3">
                   هل اختبرت تعهدك اليوم؟
                 </p>
-                <p className="text-[14px] text-kanah-text leading-[2] mb-4">
+                <p className="text-[14.5px] text-kanah-text leading-[2] mb-5">
                   {activePledge.pledgeText}
                 </p>
 
-                {/* Primary — full width */}
                 <button
                   onClick={() => handlePledgeOutcome("done")}
-                  className="w-full rounded-2xl bg-kanah-accent text-white py-3.5 text-[14px] font-semibold mb-2.5 active:scale-[0.98] transition-transform"
+                  className="w-full rounded-full bg-kanah-accent text-kanah-on-accent py-3.5 text-[14px] font-bold mb-2.5 active:scale-[0.98] transition-transform shadow-accent"
                 >
                   نعم، طبّقته
                 </button>
 
-                {/* Secondary — 3 equal */}
                 <div className="grid grid-cols-3 gap-2">
                   {(
                     [
@@ -227,7 +195,7 @@ export default function HomePage() {
                     <button
                       key={value}
                       onClick={() => handlePledgeOutcome(value)}
-                      className="rounded-xl border border-kanah-border bg-kanah-surface py-2.5 text-[11.5px] font-medium text-kanah-muted active:scale-[0.97] transition-transform"
+                      className="rounded-full border border-kanah-border bg-kanah-surface py-2.5 text-[11.5px] font-medium text-kanah-muted active:scale-[0.97] transition-transform"
                     >
                       {label}
                     </button>
@@ -235,42 +203,53 @@ export default function HomePage() {
                 </div>
               </motion.div>
             )}
+
+            <motion.p
+              variants={item}
+              className="text-[12.5px] text-kanah-locked leading-[1.9] border-t border-kanah-border pt-5 mt-6"
+            >
+              يمكنك عيش أكثر من معنى اليوم، لكن كل مسار يفتح لك قصة واحدة يومياً.
+            </motion.p>
           </motion.div>
         </section>
       ) : (
-        /* ── CHOOSE TODAY ── */
-        <section className="px-6">
+        /* ── TODAY'S STORY ── */
+        <section className="px-6 relative z-10">
           <motion.div
             variants={container}
             initial="hidden"
             animate="show"
-            className="bg-kanah-card border border-kanah-border rounded-[28px] p-6 mb-4"
+            className="rounded-[32px] bg-kanah-card border border-kanah-border p-7 mb-4 relative overflow-hidden"
           >
+            {/* warm glow inside the hero */}
+            <div
+              aria-hidden
+              className="absolute -top-24 -start-24 w-64 h-64 rounded-full pointer-events-none"
+              style={{
+                background:
+                  "radial-gradient(circle, var(--kanah-glow), transparent 70%)",
+              }}
+            />
+
             <motion.p
               variants={item}
-              className="text-[10px] font-semibold text-kanah-accent-muted tracking-[0.2em] uppercase mb-3"
+              className="text-[10.5px] font-semibold text-kanah-accent-muted tracking-[0.2em] mb-5 relative"
             >
               {activeTrack ? "مسارك الآن" : "ابدأ رحلتك"}
             </motion.p>
 
-            <motion.h1
-              variants={item}
-              className="text-[26px] font-extrabold text-kanah-text leading-[1.45] mb-2"
-            >
-              {activeTrack ? (
-                <>
-                  تابع رحلتك
-                  <br />
-                  <span className="text-kanah-accent">مع {activeTrack.word}</span>
-                </>
-              ) : (
-                "اختر مساراً تبدأ معه"
-              )}
-            </motion.h1>
+            {activeTrack && (
+              <motion.p
+                variants={item}
+                className="font-display text-[52px] text-kanah-accent leading-[1.1] mb-5 relative"
+              >
+                {activeTrack.word}
+              </motion.p>
+            )}
 
             <motion.p
               variants={item}
-              className="text-[13px] text-kanah-muted leading-[1.9] mb-6"
+              className="text-[14px] text-kanah-muted leading-[1.9] mb-7 relative"
             >
               {activeTrack
                 ? "كل مسار يفتح لك قصة واحدة يومياً."
@@ -278,29 +257,30 @@ export default function HomePage() {
             </motion.p>
 
             {activeTrack && activeTrackNextStory ? (
-              <motion.div variants={item} className="flex flex-col gap-3">
-                {/* Story preview — tinted bg, no redundant border */}
-                <div className="rounded-2xl bg-kanah-accent-subtle px-5 py-4">
+              <motion.div variants={item} className="flex flex-col gap-4 relative">
+                <div className="border-s-2 border-kanah-accent ps-5 py-1">
                   <p className="text-[11px] text-kanah-accent-muted mb-1.5">
                     القصة {toArabicNumeral(activeTrackNextStory.storyNumber)} من{" "}
                     {toArabicNumeral(activeTrack.totalStories)}
                   </p>
-                  <p className="text-[19px] font-bold text-kanah-accent leading-snug mb-1">
+                  <p className="text-[19px] font-bold text-kanah-text leading-snug mb-1">
                     {activeTrackNextStory.title}
                   </p>
-                  <p className="text-[12px] text-kanah-muted">{activeTrack.subtitle}</p>
+                  <p className="text-[12px] text-kanah-muted">
+                    {activeTrack.subtitle}
+                  </p>
                 </div>
 
                 <Link
                   href={`/tracks/${activeTrack.id}/stories/${activeTrackNextStory.id}`}
-                  className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl text-[15px] font-semibold bg-kanah-accent text-white shadow-accent active:scale-[0.98] transition-transform"
+                  className="flex items-center justify-center gap-2 w-full py-4 rounded-full text-[15px] font-bold bg-kanah-accent text-kanah-on-accent shadow-accent active:scale-[0.98] transition-transform"
                 >
-                  تابع قصة اليوم
+                  اقرأ قصة اليوم
                   <ChevronLeft size={16} strokeWidth={2.5} />
                 </Link>
               </motion.div>
             ) : (
-              <motion.div variants={item} className="flex flex-col gap-2.5">
+              <motion.div variants={item} className="flex flex-col gap-2.5 relative">
                 {readyTracks.map((track) => {
                   const completed =
                     userData.completedStoriesByTrack[track.id]?.length ?? 0;
@@ -308,18 +288,18 @@ export default function HomePage() {
                     <Link
                       key={track.id}
                       href={`/tracks/${track.id}`}
-                      className="flex items-center justify-between rounded-2xl border border-kanah-border bg-kanah-surface px-5 py-4 active:scale-[0.98] transition-transform"
+                      className="flex items-center justify-between rounded-[22px] border border-kanah-border bg-kanah-surface px-5 py-4 active:scale-[0.98] transition-transform"
                     >
                       <div>
-                        <p className="text-[17px] font-bold text-kanah-accent">
+                        <p className="font-display text-[22px] text-kanah-accent leading-tight">
                           {track.word}
                         </p>
-                        <p className="text-[11px] text-kanah-muted mt-0.5">
+                        <p className="text-[11px] text-kanah-muted mt-1">
                           {track.subtitle}
                         </p>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] text-kanah-locked">
+                        <span className="text-[11px] text-kanah-locked tabular-nums">
                           {toArabicNumeral(completed)}/
                           {toArabicNumeral(track.totalStories)}
                         </span>
@@ -338,47 +318,44 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ── LIBRARY ── */}
-      <section className="px-6 pt-3">
+      {/* ── LIBRARY LINK ── */}
+      <section className="px-6 pt-4 relative z-10">
         <Link
           href="/library"
-          className="flex items-center justify-between rounded-[24px] border border-kanah-border bg-kanah-surface px-6 py-5 active:scale-[0.99] transition-transform hover:bg-kanah-card"
+          className="flex items-center gap-4 rounded-[26px] border border-kanah-border bg-kanah-surface/60 px-6 py-5 active:scale-[0.99] transition-transform"
         >
-          <div>
-            <p className="text-[10px] font-semibold text-kanah-accent-muted tracking-[0.2em] uppercase mb-2">
-              المكتبة
+          <span className="flex items-center justify-center w-11 h-11 rounded-full bg-kanah-accent-subtle text-kanah-accent shrink-0">
+            <BookOpen size={19} strokeWidth={1.8} />
+          </span>
+          <div className="flex-1">
+            <p className="text-[15.5px] font-bold text-kanah-text mb-0.5">
+              مكتبة الكلمات
             </p>
-            <p className="text-[18px] font-bold text-kanah-text mb-1">
-              استكشف مكتبة الكلمات
-            </p>
-            <p className="text-[12px] text-kanah-muted leading-[1.8]">
+            <p className="text-[12px] text-kanah-muted">
               كل كلمة مسار قصصي كامل.
             </p>
           </div>
-          <ChevronLeft
-            size={18}
-            strokeWidth={1.5}
-            className="text-kanah-accent-muted flex-shrink-0 ms-2"
-          />
+          <ChevronLeft size={17} strokeWidth={1.6} className="text-kanah-locked" />
         </Link>
       </section>
 
       {/* ── STATS ── */}
-      <section className="px-6 pt-3">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-kanah-card rounded-2xl px-5 pt-5 pb-4 border border-kanah-border">
-            <span className="text-[42px] font-extrabold text-kanah-accent leading-none block mb-2 tabular-nums">
+      <section className="px-6 pt-4 relative z-10">
+        <div className="flex rounded-[26px] border border-kanah-border bg-kanah-card overflow-hidden">
+          <div className="flex-1 px-6 py-6">
+            <span className="font-display text-[44px] text-kanah-accent leading-none block mb-2 tabular-nums">
               {toArabicNumeral(totalCompleted)}
             </span>
-            <span className="text-[11px] text-kanah-muted leading-snug block">
+            <span className="text-[11.5px] text-kanah-muted leading-snug block">
               قصة أتممتها
             </span>
           </div>
-          <div className="bg-kanah-card rounded-2xl px-5 pt-5 pb-4 border border-kanah-border">
-            <span className="text-[42px] font-extrabold text-kanah-accent leading-none block mb-2 tabular-nums">
+          <div className="w-px bg-kanah-border my-5" />
+          <div className="flex-1 px-6 py-6">
+            <span className="font-display text-[44px] text-kanah-accent leading-none block mb-2 tabular-nums">
               {toArabicNumeral(totalDays)}
             </span>
-            <span className="text-[11px] text-kanah-muted leading-snug block">
+            <span className="text-[11.5px] text-kanah-muted leading-snug block">
               يوم عشت فيه معنى
             </span>
           </div>

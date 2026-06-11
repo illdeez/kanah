@@ -6,7 +6,7 @@ import { Sun, BookOpen, Layers } from "lucide-react";
 import { motion } from "framer-motion";
 
 const navItems = [
-  { href: "/", label: "الرئيسية", Icon: Sun },
+  { href: "/", label: "اليوم", Icon: Sun },
   { href: "/library", label: "المكتبة", Icon: BookOpen },
   { href: "/trace", label: "أثري", Icon: Layers },
 ];
@@ -15,46 +15,39 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 max-w-md mx-auto bg-kanah-bg/96 backdrop-blur-sm border-t border-kanah-border z-50">
-      <div className="flex items-center justify-around h-16">
+    <nav className="fixed bottom-5 inset-x-0 z-50 flex justify-center pointer-events-none">
+      <div className="pointer-events-auto flex items-center gap-1 rounded-full border border-kanah-border bg-kanah-nav-glass backdrop-blur-xl px-2 py-2 shadow-soft">
         {navItems.map(({ href, label, Icon }) => {
           const active = pathname === href;
           return (
             <Link
               key={href}
               href={href}
-              className="flex flex-col items-center gap-1.5 flex-1 py-2 relative"
+              className="relative flex items-center gap-2 px-4 py-2.5 rounded-full"
             >
               {active && (
                 <motion.span
-                  layoutId="bottom-nav-indicator"
-                  className="absolute top-0 inset-x-5 h-[1.5px] bg-kanah-accent rounded-full"
-                  transition={{ type: "spring", damping: 32, stiffness: 380 }}
+                  layoutId="bottom-nav-pill"
+                  className="absolute inset-0 rounded-full bg-kanah-accent"
+                  transition={{ type: "spring", damping: 30, stiffness: 360 }}
                 />
               )}
-              <motion.div
-                animate={{
-                  color: active
-                    ? "var(--color-kanah-accent)"
-                    : "var(--color-kanah-locked)",
-                }}
-                transition={{ duration: 0.2 }}
-              >
-                <Icon size={20} strokeWidth={active ? 2 : 1.5} />
-              </motion.div>
-              <motion.span
-                animate={{
-                  color: active
-                    ? "var(--color-kanah-accent)"
-                    : "var(--color-kanah-locked)",
-                }}
-                transition={{ duration: 0.2 }}
-                className={`text-[10.5px] tracking-wide ${
-                  active ? "font-semibold" : "font-normal"
+              <Icon
+                size={17}
+                strokeWidth={active ? 2.2 : 1.7}
+                className={`relative ${
+                  active ? "text-kanah-on-accent" : "text-kanah-muted"
+                }`}
+              />
+              <span
+                className={`relative text-[12.5px] ${
+                  active
+                    ? "font-semibold text-kanah-on-accent"
+                    : "font-normal text-kanah-muted"
                 }`}
               >
                 {label}
-              </motion.span>
+              </span>
             </Link>
           );
         })}

@@ -2,6 +2,7 @@
 
 import { AgentChat, createAgentChat } from "@21st-sdk/nextjs"
 import { useChat } from "@ai-sdk/react"
+import TopBar from "@/components/TopBar"
 
 const chat = createAgentChat({
   agent: "kanah-assistant",
@@ -14,12 +15,12 @@ export default function ChatPage() {
     useChat({ chat } as any) as any
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
-      <div className="border-b border-white/10 px-6 py-4">
-        <h1 className="text-white text-xl font-semibold">المساعد الإسلامي</h1>
-        <p className="text-white/40 text-sm">اسألني عن أسماء الله الحسنى</p>
-      </div>
-      <div className="flex-1">
+    <div className="min-h-screen flex flex-col relative">
+      <TopBar kicker="كَنْه" title="المساعد الإسلامي" />
+      <p className="px-6 pt-3 text-[12.5px] text-kanah-muted">
+        اسألني عن أسماء الله الحسنى
+      </p>
+      <div className="flex-1 relative z-10">
         <AgentChat
           messages={messages}
           onSend={() => handleSubmit()}
