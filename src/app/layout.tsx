@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Amiri, IBM_Plex_Sans_Arabic } from "next/font/google";
 import "./globals.css";
+import SplashScreen from "@/components/SplashScreen";
 
 const amiri = Amiri({
   subsets: ["arabic", "latin"],
@@ -44,6 +45,7 @@ export default function RootLayout({
       <body
         className={`${plex.variable} ${amiri.variable} font-sans bg-kanah-bg text-kanah-text`}
       >
+        <SplashScreen />
         <div className="kanah-ambient" />
         <div className="min-h-screen max-w-md mx-auto relative">
           {children}
