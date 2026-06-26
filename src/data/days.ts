@@ -1,3 +1,13 @@
+import {
+  khafidStories,
+  rafiStories,
+  muizzStories,
+  mudhillStories,
+  sameeStories,
+  baseerStories,
+  hakamStories,
+} from "./asmaJourneys";
+
 export interface StoryContent {
   id: number;
   storyNumber: number;
@@ -4788,6 +4798,7 @@ const asmaNames: NameItem[] = [
     ],
     pledgeText: "سأحاسب قلبي على أول علوٍّ يتسلّل إليه، خوفاً من خفض المتكبرين.",
     contentReady: true,
+    stories: khafidStories,
   },
   {
     id: "al-rafi",
@@ -4807,6 +4818,7 @@ const asmaNames: NameItem[] = [
     ],
     pledgeText: "لن أتسلّق على أحد؛ سأخلص عملي وأترك رفعتي للرافع.",
     contentReady: true,
+    stories: rafiStories,
   },
   {
     id: "al-muizz",
@@ -4826,6 +4838,7 @@ const asmaNames: NameItem[] = [
     ],
     pledgeText: "لن أستجدي قيمتي من أحد؛ سأطلب عزّتي من المعزّ وحده.",
     contentReady: true,
+    stories: muizzStories,
   },
   {
     id: "al-mudhill",
@@ -4845,6 +4858,7 @@ const asmaNames: NameItem[] = [
     ],
     pledgeText: "لن أتقوّى بإذلال أحد، وسأطلب العزّ بالافتقار إلى الله لا بالكِبر.",
     contentReady: true,
+    stories: mudhillStories,
   },
   {
     id: "al-sami",
@@ -4864,6 +4878,7 @@ const asmaNames: NameItem[] = [
     ],
     pledgeText: "حين لا يفهمني أحد، سأبثّ ما في صدري للسميع الذي يسمع همسي.",
     contentReady: true,
+    stories: sameeStories,
   },
   {
     id: "al-basir",
@@ -4883,6 +4898,7 @@ const asmaNames: NameItem[] = [
     ],
     pledgeText: "سأفعل الخير لعين البصير التي لا تنام، لا لشهود الناس.",
     contentReady: true,
+    stories: baseerStories,
   },
   {
     id: "al-hakam",
@@ -4902,6 +4918,7 @@ const asmaNames: NameItem[] = [
     ],
     pledgeText: "سأودع كل مظلمةٍ عجزتُ عن إنصافها عند الحَكَم الذي لا يجور.",
     contentReady: true,
+    stories: hakamStories,
   },
   {
     id: "al-adl",
