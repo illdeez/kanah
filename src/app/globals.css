@@ -101,7 +101,7 @@
   --color-kanah-veil: var(--kanah-veil);
 
   --font-sans: var(--font-plex), system-ui, sans-serif;
-  --font-display: var(--font-amiri), serif;
+  --font-display: var(--font-markazi), "Markazi Text", serif;
 
   --shadow-accent: 0 8px 30px -10px var(--kanah-soft-shadow), 0 2px 8px -4px var(--kanah-soft-shadow-2);
   --shadow-soft: 0 10px 34px -16px var(--kanah-soft-shadow);

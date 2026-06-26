@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Amiri, IBM_Plex_Sans_Arabic } from "next/font/google";
+import { Markazi_Text, IBM_Plex_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 import SplashScreen from "@/components/SplashScreen";
 
-const amiri = Amiri({
+const markazi = Markazi_Text({
   subsets: ["arabic", "latin"],
-  weight: ["400", "700"],
-  variable: "--font-amiri",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-markazi",
   display: "swap",
 });
 
@@ -44,7 +44,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body
-        className={`${plex.variable} ${amiri.variable} font-sans bg-kanah-bg text-kanah-text`}
+        className={`${plex.variable} ${markazi.variable} font-sans bg-kanah-bg text-kanah-text`}
       >
         <SplashScreen />
         <div className="kanah-ambient" />
