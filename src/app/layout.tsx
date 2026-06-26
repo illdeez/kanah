@@ -1,14 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Markazi_Text } from "next/font/google";
+import { Amiri, IBM_Plex_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 import SplashScreen from "@/components/SplashScreen";
 
-// One family everywhere (Greta Text Arabic is commercial; Markazi Text is the
-// design's specified fallback and what the artboards render with).
-const markazi = Markazi_Text({
+const amiri = Amiri({
   subsets: ["arabic", "latin"],
+  weight: ["400", "700"],
+  variable: "--font-amiri",
+  display: "swap",
+});
+
+const plex = IBM_Plex_Sans_Arabic({
+  subsets: ["arabic"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-markazi",
+  variable: "--font-plex",
   display: "swap",
 });
 
@@ -39,7 +44,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body
-        className={`${markazi.variable} font-sans bg-kanah-bg text-kanah-text`}
+        className={`${plex.variable} ${amiri.variable} font-sans bg-kanah-bg text-kanah-text`}
       >
         <SplashScreen />
         <div className="kanah-ambient" />
