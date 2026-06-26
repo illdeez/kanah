@@ -24,6 +24,14 @@ import {
   mujibStories,
   wasiStories,
   hakimStories,
+  waliStories,
+  hamidStories,
+  muhsiStories,
+  mubdiStories,
+  muidStories,
+  muhyiStories,
+  mumitStories,
+  hayyStories,
 } from "./asmaJourneys";
 
 export interface StoryContent {
@@ -6313,6 +6321,14 @@ const asmaJourneyByNameId: Record<string, StoryContent[]> = {
   "al-mujib": mujibStories,
   "al-wasi": wasiStories,
   "al-hakim": hakimStories,
+  "al-wali": waliStories,
+  "al-hamid": hamidStories,
+  "al-muhsi": muhsiStories,
+  "al-mubdi": mubdiStories,
+  "al-muid": muidStories,
+  "al-muhyi": muhyiStories,
+  "al-mumit": mumitStories,
+  "al-hayy": hayyStories,
 };
 for (const _name of asmaNames) {
   const _journey = asmaJourneyByNameId[_name.id];
