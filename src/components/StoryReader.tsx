@@ -9,9 +9,11 @@ const ease = [0.16, 1, 0.3, 1] as const;
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="flex items-center gap-2.5 text-[11px] font-semibold text-kanah-accent-muted tracking-[0.18em] mb-5">
-      <span className="w-5 h-px bg-kanah-accent-muted/60" />
-      {children}
+    <p className="flex items-center gap-3 mb-5">
+      <span className="w-7 h-px bg-kanah-accent" />
+      <span className="font-display text-[22px] font-bold text-kanah-text leading-none">
+        {children}
+      </span>
     </p>
   );
 }
@@ -112,10 +114,10 @@ export default function StoryReader({
           transition={{ ease, duration: 0.65 }}
           className="pt-14 pb-12 text-center"
         >
-          <p className="text-[11px] text-kanah-accent-muted tracking-[0.2em] mb-8">
+          <p className="text-[11px] text-kanah-accent tracking-[0.2em] font-semibold mb-8">
             {heroKicker}
           </p>
-          <p className="font-display text-[64px] leading-none text-kanah-accent mb-7">
+          <p className="font-display text-[60px] leading-[1.15] text-kanah-text mb-6">
             {heroWord}
           </p>
           <h1 className="text-[24px] font-bold text-kanah-text leading-[1.6] mb-3">
@@ -155,9 +157,11 @@ export default function StoryReader({
 
         <Section>
           <section className="mb-8">
-            <div className="rounded-[28px] border border-kanah-border bg-kanah-card p-7">
-              <SectionLabel>سؤال محاسبة</SectionLabel>
-              <p className="font-display text-[21px] leading-[1.95] text-kanah-text">
+            <div className="rounded-[24px] bg-kanah-accent-subtle border border-kanah-accent/30 p-7">
+              <p className="text-[11px] font-bold text-kanah-accent tracking-[0.18em] mb-4">
+                سؤال محاسبة
+              </p>
+              <p className="font-display text-[24px] leading-[1.7] text-kanah-text">
                 {reflectionQuestion}
               </p>
             </div>
@@ -166,9 +170,11 @@ export default function StoryReader({
 
         <Section>
           <section ref={actionRef}>
-            <div className="rounded-[28px] bg-kanah-accent-subtle border border-kanah-accent/20 p-7">
-              <SectionLabel>عمل اليوم</SectionLabel>
-              <p className="text-[17px] leading-[2.1] text-kanah-text whitespace-pre-line">
+            <div className="rounded-[24px] bg-kanah-midnight p-7">
+              <p className="text-[11px] font-bold text-kanah-accent tracking-[0.18em] mb-4">
+                عمل اليوم
+              </p>
+              <p className="font-display text-[21px] leading-[1.8] text-kanah-on-midnight whitespace-pre-line">
                 {dailyAction}
               </p>
             </div>
@@ -196,12 +202,15 @@ export default function StoryReader({
               onClick={onComplete}
               disabled={!actionSeen || completing}
               whileTap={actionSeen ? { scale: 0.97 } : {}}
-              className={`w-full py-4 rounded-full text-[16px] font-bold disabled:cursor-default transition-colors ${
+              className={`w-full py-4 rounded-full text-[16px] font-semibold disabled:cursor-default transition-colors flex items-center justify-center gap-2.5 ${
                 actionSeen
-                  ? "bg-kanah-accent text-kanah-on-accent shadow-accent"
+                  ? "bg-kanah-text text-kanah-card shadow-soft"
                   : "bg-kanah-surface text-kanah-locked"
               }`}
             >
+              {actionSeen && (
+                <span className="w-1.5 h-1.5 rounded-full bg-kanah-accent" />
+              )}
               أتممت عمل اليوم
             </motion.button>
           </AnimatePresence>

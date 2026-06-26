@@ -217,7 +217,7 @@ export default function CompletionFlow({
                 سيُحفَظ هذا التعهد كتذكير بسلوك اليوم.
               </p>
               <div className="rounded-[28px] border border-kanah-accent/20 bg-kanah-accent-subtle p-7">
-                <p className="font-display text-[26px] text-kanah-accent mb-4 leading-none">
+                <p className="font-display text-[26px] text-kanah-text mb-4 leading-[1.2]">
                   {word}
                 </p>
                 <p className="text-[17px] leading-[2.05] text-kanah-text">
@@ -242,7 +242,7 @@ export default function CompletionFlow({
               onClick={handleSaveLine}
               disabled={!selectedLine && selectedLines.length > 0}
               whileTap={selectedLine || selectedLines.length === 0 ? { scale: 0.97 } : {}}
-              className="w-full bg-kanah-accent text-kanah-on-accent py-4 rounded-full text-[16px] font-bold shadow-accent disabled:opacity-40 disabled:cursor-default"
+              className="w-full bg-kanah-text text-kanah-card py-4 rounded-full text-[16px] font-semibold shadow-soft disabled:opacity-40 disabled:cursor-default"
             >
               {selectedLines.length > 0 ? "احفظها في أثري" : "التالي"}
             </motion.button>
@@ -255,7 +255,7 @@ export default function CompletionFlow({
               transition={{ ease, duration: 0.3 }}
               onClick={handleSavePledge}
               whileTap={{ scale: 0.97 }}
-              className="w-full bg-kanah-accent text-kanah-on-accent py-4 rounded-full text-[16px] font-bold shadow-accent"
+              className="w-full bg-kanah-text text-kanah-card py-4 rounded-full text-[16px] font-semibold shadow-soft"
             >
               أتعهد بهذا اليوم
             </motion.button>

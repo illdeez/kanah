@@ -51,7 +51,7 @@ export default function SplashScreen() {
             initial={{ opacity: 0, scale: 0.92, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.9, ease }}
-            className="font-display text-[88px] leading-none text-kanah-accent"
+            className="font-display text-[92px] leading-[1.1] text-kanah-text"
           >
             كَنْه
           </motion.p>

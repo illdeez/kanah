@@ -1,64 +1,77 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────
-   Kanah design system — dual theme
-   Midnight (default): deep ink + warm gold
-   Light: cream paper + bronze
+   كَنْه — "IVORY MANUSCRIPT" design system
+   Light (default): ivory paper + antique gold
+   Dark: midnight + warm gold
+   See DESIGN.md (imported from the designer brief).
    ───────────────────────────────────────────── */
 
 :root,
-[data-theme="dark"] {
-  color-scheme: dark;
-
-  --kanah-bg: oklch(14.8% 0.018 252);
-  --kanah-bg-deep: oklch(12% 0.02 256);
-  --kanah-card: oklch(18.6% 0.02 250);
-  --kanah-surface: oklch(22% 0.022 250);
-  --kanah-border: oklch(27% 0.02 250);
-
-  --kanah-text: oklch(93.5% 0.01 85);
-  --kanah-muted: oklch(69% 0.018 78);
-  --kanah-locked: oklch(47% 0.018 252);
-
-  --kanah-accent: oklch(79% 0.115 82);
-  --kanah-accent-strong: oklch(84% 0.128 86);
-  --kanah-on-accent: oklch(17% 0.032 82);
-  --kanah-accent-muted: oklch(64% 0.07 80);
-  --kanah-accent-subtle: oklch(21.5% 0.032 82);
-
-  --kanah-completed: oklch(74% 0.105 165);
-  --kanah-completed-subtle: oklch(22% 0.035 165);
-
-  --kanah-glow: oklch(79% 0.115 82 / 0.22);
-  --kanah-nav-glass: oklch(18.6% 0.02 250 / 0.82);
-  --kanah-veil: oklch(14.8% 0.018 252 / 0.88);
-}
-
 [data-theme="light"] {
   color-scheme: light;
 
-  --kanah-bg: oklch(96.6% 0.012 85);
-  --kanah-bg-deep: oklch(94% 0.018 83);
-  --kanah-card: oklch(99.1% 0.005 85);
-  --kanah-surface: oklch(93.6% 0.015 85);
-  --kanah-border: oklch(88.5% 0.013 85);
+  --kanah-bg: #f1eadb;
+  --kanah-bg-deep: #e9e0cd;
+  --kanah-card: #fcfaf3;
+  --kanah-surface: #f6efe1;
+  --kanah-border: #e2d8c3;
 
-  --kanah-text: oklch(23.5% 0.025 252);
-  --kanah-muted: oklch(46% 0.02 252);
-  --kanah-locked: oklch(69% 0.012 252);
+  --kanah-text: #2b2720;
+  --kanah-muted: #6e6657;
+  --kanah-locked: #a89e88;
 
-  --kanah-accent: oklch(51% 0.105 70);
-  --kanah-accent-strong: oklch(45% 0.11 66);
-  --kanah-on-accent: oklch(98.5% 0.008 85);
-  --kanah-accent-muted: oklch(61% 0.07 72);
-  --kanah-accent-subtle: oklch(93% 0.028 80);
+  --kanah-accent: #9c7c38;
+  --kanah-accent-strong: #8a6c30;
+  --kanah-on-accent: #fcfaf3;
+  --kanah-accent-muted: #b89a5a;
+  --kanah-accent-subtle: #efe6cf;
 
-  --kanah-completed: oklch(46% 0.1 160);
-  --kanah-completed-subtle: oklch(93% 0.03 160);
+  --kanah-completed: #4b7a61;
+  --kanah-completed-subtle: #e3ece4;
 
-  --kanah-glow: oklch(51% 0.105 70 / 0.14);
-  --kanah-nav-glass: oklch(99.1% 0.005 85 / 0.85);
-  --kanah-veil: oklch(96.6% 0.012 85 / 0.9);
+  --kanah-midnight: #26334c;
+  --kanah-on-midnight: #f1eadb;
+
+  --kanah-glow: rgba(156, 124, 56, 0.1);
+  --kanah-nav-glass: rgba(252, 250, 243, 0.85);
+  --kanah-veil: rgba(241, 234, 219, 0.9);
+
+  --kanah-soft-shadow: rgba(70, 58, 32, 0.1);
+  --kanah-soft-shadow-2: rgba(70, 58, 32, 0.06);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --kanah-bg: #13151c;
+  --kanah-bg-deep: #0f1015;
+  --kanah-card: #1b1e28;
+  --kanah-surface: #232734;
+  --kanah-border: #2b3040;
+
+  --kanah-text: #ece5d4;
+  --kanah-muted: #b4ac97;
+  --kanah-locked: #7c7561;
+
+  --kanah-accent: #c8a961;
+  --kanah-accent-strong: #d8bc78;
+  --kanah-on-accent: #13151c;
+  --kanah-accent-muted: #9e8a55;
+  --kanah-accent-subtle: #2c2a20;
+
+  --kanah-completed: #74a286;
+  --kanah-completed-subtle: #1e2a23;
+
+  --kanah-midnight: #2e3b52;
+  --kanah-on-midnight: #ece5d4;
+
+  --kanah-glow: rgba(200, 169, 97, 0.1);
+  --kanah-nav-glass: rgba(27, 30, 40, 0.86);
+  --kanah-veil: rgba(19, 21, 28, 0.9);
+
+  --kanah-soft-shadow: rgba(0, 0, 0, 0.4);
+  --kanah-soft-shadow-2: rgba(0, 0, 0, 0.28);
 }
 
 @theme inline {
@@ -81,14 +94,18 @@
   --color-kanah-completed: var(--kanah-completed);
   --color-kanah-completed-subtle: var(--kanah-completed-subtle);
 
+  --color-kanah-midnight: var(--kanah-midnight);
+  --color-kanah-on-midnight: var(--kanah-on-midnight);
+
   --color-kanah-nav-glass: var(--kanah-nav-glass);
   --color-kanah-veil: var(--kanah-veil);
 
-  --font-sans: var(--font-plex), system-ui, sans-serif;
-  --font-display: var(--font-amiri), serif;
+  --font-sans: var(--font-markazi), "Markazi Text", serif;
+  --font-display: var(--font-markazi), "Markazi Text", serif;
+  --font-ruqaa: var(--font-markazi), "Markazi Text", serif;
 
-  --shadow-accent: 0 10px 36px -10px var(--kanah-glow), 0 2px 8px -2px var(--kanah-glow);
-  --shadow-soft: 0 8px 30px -12px oklch(0% 0 0 / 0.35);
+  --shadow-accent: 0 8px 30px -10px var(--kanah-soft-shadow), 0 2px 8px -4px var(--kanah-soft-shadow-2);
+  --shadow-soft: 0 10px 34px -16px var(--kanah-soft-shadow);
 }
 
 html {
@@ -100,34 +117,46 @@ body {
   color: var(--kanah-text);
   -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.35s ease, color 0.35s ease;
+  transition: background-color 0.55s ease, color 0.55s ease;
 }
 
-/* ambient glow behind the top of every page */
+/* Faint gold ambient at the top of the page (rare, low) */
 .kanah-ambient {
   position: fixed;
   inset-inline: 0;
-  top: -180px;
-  height: 420px;
+  top: -160px;
+  height: 360px;
   pointer-events: none;
   z-index: 0;
+  opacity: 0.55;
   background: radial-gradient(
-    ellipse 70% 60% at 50% 0%,
+    ellipse 60% 56% at 50% 0%,
     var(--kanah-glow),
     transparent 70%
   );
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
 ::selection {
-  background: var(--kanah-accent-subtle);
+  background: rgba(156, 124, 56, 0.22);
+  color: var(--kanah-text);
 }
 
 ::-webkit-scrollbar {
-  width: 3px;
+  width: 4px;
 }
 ::-webkit-scrollbar-thumb {
   background: var(--kanah-border);
-  border-radius: 2px;
+  border-radius: 9px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
