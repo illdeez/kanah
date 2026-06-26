@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getName, getNamesTrack, toArabicNumeral } from "@/data/days";
 import {
   completeNameStory,
+  getAppDayKey,
   getTodayNameRead,
   getUserData,
   isDevMode,
@@ -24,8 +25,10 @@ export default function NameStoryPage() {
   const [devMode, setDevMode] = useState(false);
   const [devUnlimited, setDevUnlimited] = useState(false);
   const [completing, setCompleting] = useState(false);
+  const sessionDayKey = useRef<string | null>(null);
 
   useEffect(() => {
+    if (sessionDayKey.current === null) sessionDayKey.current = getAppDayKey();
     setUserData(getUserData());
     setDevMode(isDevMode());
     setDevUnlimited(isDevUnlimited());
@@ -75,7 +78,7 @@ export default function NameStoryPage() {
 
   function handleComplete() {
     setCompleting(true);
-    completeNameStory(trackId, nameId, storyId);
+    completeNameStory(trackId, nameId, storyId, sessionDayKey.current ?? undefined);
     router.push(`/tracks/${trackId}/names/${nameId}/stories/${storyId}/complete`);
   }
 

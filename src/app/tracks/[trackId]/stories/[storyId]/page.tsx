@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   getStory,
@@ -11,6 +11,7 @@ import {
 } from "@/data/days";
 import {
   completeStory,
+  getAppDayKey,
   getTodayTrackRead,
   getUserData,
   isDevMode,
@@ -29,8 +30,11 @@ export default function StoryPage() {
   const [devMode, setDevMode] = useState(false);
   const [devUnlimited, setDevUnlimited] = useState(false);
   const [completing, setCompleting] = useState(false);
+  // [P0-02] Pin the bucket to the day the reading session began (client-only).
+  const sessionDayKey = useRef<string | null>(null);
 
   useEffect(() => {
+    if (sessionDayKey.current === null) sessionDayKey.current = getAppDayKey();
     setUserData(getUserData());
     setDevMode(isDevMode());
     setDevUnlimited(isDevUnlimited());
@@ -77,7 +81,7 @@ export default function StoryPage() {
 
   function handleComplete() {
     setCompleting(true);
-    completeStory(trackId, storyId);
+    completeStory(trackId, storyId, sessionDayKey.current ?? undefined);
     router.push(`/tracks/${trackId}/stories/${storyId}/complete`);
   }
 

@@ -71,7 +71,7 @@ export default function NamesListPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ease, duration: 0.55 }}
-          className="font-display text-[44px] text-kanah-accent leading-[1.25] mb-5"
+          className="font-display text-[46px] text-kanah-text leading-[1.3] mb-5"
         >
           {track.word}
         </motion.h1>

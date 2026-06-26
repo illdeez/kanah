@@ -74,8 +74,9 @@ export default function TracePage() {
       ? getStory(todayRead.trackId, todayRead.storyId)
       : null;
   const totalCommitments = userData.pledges.length;
-  const doneCount = userData.pledges.filter((pledge) => pledge.status === "done").length;
-  const triedCount = userData.pledges.filter((pledge) => pledge.status === "tried").length;
+  const doneCount = userData.pledges.filter(
+    (pledge) => pledge.review?.answer === "applied"
+  ).length;
   const latestPledge =
     userData.pledges.length > 0 ? userData.pledges[userData.pledges.length - 1] : null;
   const latestPledgeTrack = latestPledge ? getTrack(latestPledge.trackId) : null;
@@ -254,7 +255,7 @@ export default function TracePage() {
                     {reflection.story!.title}
                   </span>
                   <span className="text-[10.5px] text-kanah-locked ms-auto">
-                    {formatArabicDate(reflection.createdAt)}
+                    {formatArabicDate(reflection.dayKey ?? reflection.createdAt)}
                   </span>
                 </div>
               </motion.div>
@@ -289,14 +290,18 @@ export default function TracePage() {
             </p>
             <p className="text-[12px] text-kanah-muted">
               الحالة الحالية:{" "}
-              {latestPledge.status === "active"
+              {latestPledge.status === "pending"
                 ? "بانتظار المتابعة"
-                : latestPledge.status === "done"
+                : latestPledge.status === "soft_closed"
+                ? "طُوي بهدوء"
+                : latestPledge.review?.answer === "applied"
                 ? "طبّقته"
-                : latestPledge.status === "tried"
+                : latestPledge.review?.answer === "tried"
                 ? "حاولت"
-                : latestPledge.status === "forgot"
-                ? "نسيت"
+                : latestPledge.review?.answer === "missed"
+                ? "لم أنتبه"
+                : latestPledge.review?.answer === "forgot"
+                ? "لا أذكر"
                 : "لم أواجه موقفاً"}
             </p>
           </div>

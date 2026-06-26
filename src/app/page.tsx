@@ -21,7 +21,8 @@ import {
   initUser,
   isDevMode,
   isDevUnlimited,
-  updatePledgeStatus,
+  PledgeReviewAnswer,
+  reviewPledge,
   UserData,
 } from "@/lib/storage";
 import BottomNav from "@/components/BottomNav";
@@ -99,11 +100,9 @@ export default function HomePage() {
   );
   const totalDays = Object.keys(userData.dailyReads ?? {}).length;
 
-  function handlePledgeOutcome(
-    outcome: "done" | "tried" | "forgot" | "no_situation"
-  ) {
+  function handlePledgeOutcome(answer: PledgeReviewAnswer) {
     if (!activePledge) return;
-    updatePledgeStatus(activePledge.trackId, activePledge.storyId, outcome);
+    reviewPledge(activePledge.trackId, activePledge.storyId, answer);
     setUserData(getUserData());
   }
 
@@ -132,7 +131,7 @@ export default function HomePage() {
 
             <motion.p
               variants={item}
-              className="font-display text-[44px] text-kanah-accent leading-none mb-5"
+              className="font-display text-[44px] text-kanah-text leading-[1.15] mb-5"
             >
               {activeTrack.word}
             </motion.p>
@@ -178,8 +177,8 @@ export default function HomePage() {
                 </p>
 
                 <button
-                  onClick={() => handlePledgeOutcome("done")}
-                  className="w-full rounded-full bg-kanah-accent text-kanah-on-accent py-3.5 text-[14px] font-bold mb-2.5 active:scale-[0.98] transition-transform shadow-accent"
+                  onClick={() => handlePledgeOutcome("applied")}
+                  className="w-full rounded-full bg-kanah-text text-kanah-card py-3.5 text-[14px] font-semibold mb-2.5 active:scale-[0.98] transition-transform shadow-soft"
                 >
                   نعم، طبّقته
                 </button>
@@ -188,7 +187,7 @@ export default function HomePage() {
                   {(
                     [
                       { label: "حاولت", value: "tried" },
-                      { label: "لم أنتبه", value: "forgot" },
+                      { label: "لم أنتبه", value: "missed" },
                       { label: "لم أواجه موقفاً", value: "no_situation" },
                     ] as const
                   ).map(({ label, value }) => (
@@ -241,7 +240,7 @@ export default function HomePage() {
             {activeTrack && (
               <motion.p
                 variants={item}
-                className="font-display text-[52px] text-kanah-accent leading-[1.1] mb-5 relative"
+                className="font-display text-[52px] text-kanah-text leading-[1.15] mb-5 relative"
               >
                 {activeTrack.word}
               </motion.p>
@@ -273,10 +272,10 @@ export default function HomePage() {
 
                 <Link
                   href={`/tracks/${activeTrack.id}/stories/${activeTrackNextStory.id}`}
-                  className="flex items-center justify-center gap-2 w-full py-4 rounded-full text-[15px] font-bold bg-kanah-accent text-kanah-on-accent shadow-accent active:scale-[0.98] transition-transform"
+                  className="flex items-center justify-center gap-2.5 w-full py-4 rounded-full text-[15px] font-semibold bg-kanah-text text-kanah-card shadow-soft active:scale-[0.98] transition-transform"
                 >
+                  <span className="w-1.5 h-1.5 rounded-full bg-kanah-accent" />
                   اقرأ قصة اليوم
-                  <ChevronLeft size={16} strokeWidth={2.5} />
                 </Link>
               </motion.div>
             ) : (

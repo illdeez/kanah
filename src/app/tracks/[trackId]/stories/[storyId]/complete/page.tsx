@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getStory, getTrack, toArabicNumeral } from "@/data/days";
-import { getUserData, savePledge, saveReflection } from "@/lib/storage";
+import { getRitualDayKey, getUserData, savePledge, saveReflection } from "@/lib/storage";
 import CompletionFlow from "@/components/CompletionFlow";
 
 export default function CompleteStoryPage() {
@@ -22,6 +22,9 @@ export default function CompleteStoryPage() {
 
   if (!track || !story || !isCompleted) return null;
 
+  // [P0-02] Pin reflection + pledge to the same app-day the story was bucketed under.
+  const ritualDayKey = getRitualDayKey(getUserData(), trackId, { storyId });
+
   return (
     <CompletionFlow
       badgeText={`أتممت القصة ${toArabicNumeral(story.storyNumber)}`}
@@ -30,14 +33,14 @@ export default function CompleteStoryPage() {
       selectedLines={story.selectedLines}
       pledgeText={story.pledgeText}
       pledgeHint="خذ من القصة خطوة صغيرة تحوّل المعنى إلى سلوك."
-      onSaveReflection={(line) => saveReflection(trackId, storyId, line)}
+      onSaveReflection={(line) => saveReflection(trackId, storyId, line, ritualDayKey)}
       onSavePledge={() => {
         const pledgeText = story.pledgeText ?? "";
         if (!pledgeText.trim()) {
           setTimeout(() => router.replace(`/tracks/${trackId}`), 1000);
           return;
         }
-        savePledge(trackId, storyId, pledgeText);
+        savePledge(trackId, storyId, pledgeText, ritualDayKey);
         setTimeout(() => router.replace("/"), 1000);
       }}
       onSkipLine={() => router.replace(`/tracks/${trackId}`)}

@@ -98,7 +98,7 @@ export default function TrackPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ease, duration: 0.55 }}
-          className="font-display text-[58px] text-kanah-accent leading-[1.15] mb-6"
+          className="font-display text-[58px] text-kanah-text leading-[1.2] mb-6"
         >
           {wordTrack.word}
         </motion.h1>
@@ -143,7 +143,7 @@ export default function TrackPage() {
         <section className="px-6 pb-8 relative z-10">
           <button
             onClick={handleOpenTodayStory}
-            className="block w-full text-center py-4 rounded-full text-[15.5px] font-bold bg-kanah-accent text-kanah-on-accent shadow-accent active:scale-[0.98] transition-transform"
+            className="block w-full text-center py-4 rounded-full text-[15.5px] font-semibold bg-kanah-text text-kanah-card shadow-soft active:scale-[0.98] transition-transform"
           >
             {progress > 0 ? "اقرأ قصة اليوم من هذا المسار" : "ابدأ قصة اليوم"}
           </button>
