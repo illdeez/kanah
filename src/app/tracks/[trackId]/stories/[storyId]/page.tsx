@@ -52,23 +52,19 @@ export default function StoryPage() {
     !!todayTrackRead &&
     !(todayTrackRead.itemType !== "name" && todayTrackRead.storyId === storyId);
 
+  const status = userData
+    ? getStoryStatus(trackId, storyId, userData.completedStoriesByTrack, devMode)
+    : null;
+
   useEffect(() => {
-    if (!track || !story) router.replace("/library");
-  }, [track, story, router]);
+    if (!track || !story) {
+      router.replace("/library");
+      return;
+    }
+    if (status === "locked") router.replace(`/tracks/${trackId}`);
+  }, [track, story, status, router, trackId]);
 
-  if (!userData || !track || !story) return null;
-
-  const status = getStoryStatus(
-    trackId,
-    storyId,
-    userData.completedStoriesByTrack,
-    devMode
-  );
-
-  if (status === "locked") {
-    router.replace(`/tracks/${trackId}`);
-    return null;
-  }
+  if (!userData || !track || !story || status === "locked") return null;
 
   if (blockedByDaily) {
     return (

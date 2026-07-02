@@ -102,6 +102,7 @@ export default function StoryReader({
       <TopBar kicker={topKicker} title={topTitle} readingTime={readingTime} />
       {/* reading progress */}
       <motion.div
+        aria-hidden
         style={{ scaleX: progress }}
         className="fixed top-0 inset-x-0 h-[2.5px] bg-kanah-accent origin-right z-50 max-w-md mx-auto"
       />

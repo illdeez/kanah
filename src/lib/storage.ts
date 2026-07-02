@@ -742,7 +742,7 @@ export function formatArabicDate(isoDate: string): string {
   // Accepts both a YYYY-MM-DD day key and a full ISO timestamp.
   const [year, month, day] = isoDate.slice(0, 10).split("-").map(Number);
   const date = new Date(year, month - 1, day);
-  return new Intl.DateTimeFormat("ar-u-ca-gregory", {
+  return new Intl.DateTimeFormat("ar-u-ca-gregory-nu-arab", {
     year: "numeric",
     month: "long",
     day: "numeric",

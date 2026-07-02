@@ -172,6 +172,7 @@ export default function CompletionFlow({
                         key={line}
                         variants={itemVariants}
                         type="button"
+                        aria-pressed={active}
                         onClick={() => setSelectedLine(line)}
                         whileTap={{ scale: 0.98 }}
                         className={`w-full text-right rounded-[22px] border p-5 transition-colors ${

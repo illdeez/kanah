@@ -14,7 +14,7 @@ import {
   wordTracks,
 } from "@/data/days";
 import {
-  getActivePledge,
+  getReviewCandidate,
   getTodayRead,
   getTodayTrackRead,
   getUserData,
@@ -63,7 +63,9 @@ export default function HomePage() {
     rawActiveTrack && isWordTrack(rawActiveTrack)
       ? rawActiveTrack
       : readyTracks[0] ?? wordOnlyTracks[0] ?? null;
-  const activePledge = getActivePledge(userData);
+  // Only surface a pledge that is actually due for review (yesterday's or
+  // older, ≤6 days) — never the pledge taken minutes ago today.
+  const activePledge = getReviewCandidate(userData, userData.activeTrackId);
   const activePledgeTrack = activePledge ? getTrack(activePledge.trackId) : null;
   const activePledgeStory = activePledge
     ? getStory(activePledge.trackId, activePledge.storyId)
