@@ -179,7 +179,7 @@ export default function LibraryPage() {
                   progress={progress}
                   total={track.totalNames}
                   totalLabel={`${toArabicNumeral(track.totalNames)} اسماً`}
-                  isActive={isActive}
+                  isActive={isActive && progress > 0}
                   isReady={isReady}
                   canClick
                   featured
@@ -202,7 +202,7 @@ export default function LibraryPage() {
               progress={progress}
               total={track.totalStories}
               totalLabel={`${toArabicNumeral(track.totalStories)} قصص`}
-              isActive={isActive}
+              isActive={isActive && progress > 0}
               isReady={isReady}
               canClick={canClick}
             />
